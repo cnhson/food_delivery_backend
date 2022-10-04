@@ -8,13 +8,13 @@ const { Transaction } = require("../models/transaction");
 const { sequelize } = require("../utils/common");
 
 module.exports = {
-    Init: async function (req, res) {
-        try {
-            await sequelize.sync();
-            res.json("Create all table successfully");
-        } catch (err) {
-            console.log(err);
-            res.send(err);
-        }
-    },
+  Init: async function (req, res) {
+    try {
+      await sequelize.sync();
+      res.json("Create all table successfully");
+    } catch (err) {
+      console.log(err);
+      res.send(err);
+    }
+  },
 };

@@ -20,19 +20,19 @@ app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
 /* CROS middleware */
 app.use(function (req, res, next) {
-    // All domain
-    // res.header("Access-Control-Allow-Origin", "*");
+  // All domain
+  // res.header("Access-Control-Allow-Origin", "*");
 
-    const origin = req.headers.origin;
-    if (allowedOrigins.includes(origin)) {
-        res.setHeader("Access-Control-Allow-Origin", origin);
-    }
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
 
-    res.header(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept"
-    );
-    next();
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
 });
 
 // icon for bookmarks
@@ -46,5 +46,5 @@ app.use(routes);
 //cron.start();
 
 app.listen(PORT, HOST, () => {
-    console.log(`Server is running on port: ${PORT} ${HOST}`);
+  console.log(`Server is running on port: ${PORT} ${HOST}`);
 });
