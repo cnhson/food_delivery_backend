@@ -4,8 +4,8 @@ const { ProductType } = require("../models/product_type");
 const { Account } = require("../models/account");
 const { Menu } = require("../models/menu");
 const { Store } = require("../models/store");
-const { Transaction } = require("../models/transaction");
-const { sequelize } = require("../utils/common");
+const { Order } = require("../models/order");
+const { sequelize } = require("../services/common");
 
 module.exports = {
   Init: async function (req, res) {

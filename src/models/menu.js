@@ -1,4 +1,4 @@
-const { sequelize } = require("../utils/common");
+const { sequelize } = require("../services/common");
 const { DataTypes } = require("sequelize");
 
 const Menu = sequelize.define(

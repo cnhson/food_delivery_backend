@@ -1,8 +1,8 @@
-const { sequelize } = require("../utils/common");
+const { sequelize } = require("../services/common");
 const { DataTypes } = require("sequelize");
 
-const Transaction = sequelize.define(
-  "transaction",
+const Order = sequelize.define(
+  "order",
   {
     id: {
       type: DataTypes.STRING(25),
@@ -19,10 +19,15 @@ const Transaction = sequelize.define(
     product_id: {
       type: DataTypes.STRING(25),
       allowNull: false,
+      primaryKey: true,
       references: {
         model: "menu",
         type: "id",
       },
+    },
+    quantity: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     timestamp: {
       type: DataTypes.STRING(25),
@@ -42,4 +47,4 @@ const Transaction = sequelize.define(
   }
 );
 
-module.exports = { Transaction };
+module.exports = { Order };
