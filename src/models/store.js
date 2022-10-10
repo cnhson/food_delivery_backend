@@ -12,7 +12,7 @@ const Store = sequelize.define(
       type: DataTypes.STRING(25),
       allowNull: false,
       references: {
-        model: "account",
+        model: "asdasd",
         key: "id",
       },
     },
