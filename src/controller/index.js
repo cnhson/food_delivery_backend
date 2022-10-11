@@ -5,6 +5,7 @@ const { Account } = require("../models/account");
 const { Menu } = require("../models/menu");
 const { Store } = require("../models/store");
 const { Order } = require("../models/order");
+const { Comment } = require("../models/comment");
 const { sequelize } = require("../services/common");
 
 module.exports = {
