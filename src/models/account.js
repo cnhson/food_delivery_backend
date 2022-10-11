@@ -42,4 +42,13 @@ const Account = sequelize.define(
   }
 );
 
-module.exports = { Account };
+async function getAllAccount() {
+  try {
+    const datas = await Account.findAll();
+    return datas;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+module.exports = { Account, getAllAccount };

@@ -1,11 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const app = require("../controller");
+const account_route = require("./account");
 
 router.get("/init", app.Init);
+router.use("/account", account_route);
 
-router.get("*", (req, res) => {
-  res.json("Welcome to food delivery app");
-});
+// router.get("*", (req, res) => {
+//   res.json("Welcome to food delivery app");
+// });
 
 module.exports = router;
