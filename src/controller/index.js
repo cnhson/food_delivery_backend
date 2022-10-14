@@ -1,4 +1,4 @@
-const { Role } = require("../models/role");
+const { Role, insertDefaultRole } = require("../models/role");
 const { StoreType } = require("../models/store_type");
 const { ProductType } = require("../models/product_type");
 const { Account } = require("../models/account");
@@ -12,6 +12,7 @@ module.exports = {
   Init: async function (req, res) {
     try {
       await sequelize.sync();
+      await insertDefaultRole();
       res.json("Create all table successfully");
     } catch (err) {
       console.log(err);
