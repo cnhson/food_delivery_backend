@@ -5,7 +5,8 @@ const Account = sequelize.define(
   "account",
   {
     id: {
-      type: DataTypes.STRING(25),
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
       primaryKey: true,
     },
     role_id: {
@@ -24,7 +25,7 @@ const Account = sequelize.define(
       unique: true,
     },
     password: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.STRING(100),
     },
     active_date: {
       type: DataTypes.STRING(25),
@@ -42,13 +43,40 @@ const Account = sequelize.define(
   }
 );
 
-async function getAllAccount() {
+async function insertAccount(role_id, name, email, password, timestamp) {
   try {
-    const datas = await Account.findAll();
-    return datas;
+    await Account.create({
+      role_id: role_id,
+      name: name,
+      email: email,
+      password: password,
+      del_fag: false,
+      timestamp,
+    });
+
+    return true;
   } catch (err) {
     console.log(err);
+    return false;
   }
 }
 
-module.exports = { Account, getAllAccount };
+async function getAccountByEmail(email) {
+  try {
+    const data = await Account.findAll({
+      where: {
+        email: email,
+      },
+    });
+    if (data.length > 0) {
+      return data[0];
+    } else {
+      return null;
+    }
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+
+module.exports = { Account, insertAccount, getAccountByEmail };
