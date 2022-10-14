@@ -19,4 +19,25 @@ const Role = sequelize.define(
   }
 );
 
-module.exports = { Role };
+async function insertDefaultRole() {
+  try {
+    await Role.create({
+      id: "AD",
+      name: "admin",
+    });
+
+    await Role.create({
+      id: "CUS",
+      name: "customer",
+    });
+
+    await Role.create({
+      id: "SEL",
+      name: "seller",
+    });
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+module.exports = { Role, insertDefaultRole };

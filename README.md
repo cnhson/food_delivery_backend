@@ -48,9 +48,9 @@ des: Create tables in database
 
 ## API
 
-## Account
+### Account
 
-### Register
+#### Register
 
 ```
 url: /account/register
@@ -72,7 +72,7 @@ if error:
 
 ```
 
-### Login
+#### Login
 
 ```
 url: /account/login
