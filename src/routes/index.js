@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const app = require("../controller");
-const account_route = require("./account");
+const account_route = require("./account_route");
 
 router.get("/init", app.Init);
 router.use("/account", account_route);
