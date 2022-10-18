@@ -2,15 +2,24 @@ const { insertAccount, getAccountByEmail } = require("../models/account");
 const bcrypt = require("bcryptjs");
 
 module.exports = {
-  registerAccount: async function (req, res) {
+  registerAccount: async function (req, res, next) {
     try {
-      const role_id = req.body.role_id;
+      const role_id = "";
       const name = req.body.name;
       const email = req.body.email;
       const password = req.body.password;
       const timestamp = req.body.timestamp;
       let hashedPassword = "";
 
+      //Get role according to the url
+      if (res.locals.cus) {
+        role_id = "CUS";
+      }
+      else if(res.locals.sel)
+      {
+        role_id = "SEL";
+      }
+      
       // Hash password
       bcrypt.genSalt(10, function (err, Salt) {
         bcrypt.hash(password, Salt, async function (err, hash) {
