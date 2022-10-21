@@ -17,6 +17,14 @@ const Comment = sequelize.define(
         key: "id",
       },
     },
+    order_id: {
+      type: DataTypes.STRING(25),
+      allowNull: false,
+      references: {
+        model: "order",
+        key: "id",
+      },
+    },
     account_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
