@@ -6,6 +6,8 @@ const { Menu } = require("../models/menu");
 const { Store } = require("../models/store");
 const { Order } = require("../models/order");
 const { Comment } = require("../models/comment");
+const { orderDetail } = require("../models/order_detail");
+const { Status } = require("../models/status");
 const { sequelize } = require("../services/common");
 
 module.exports = {
