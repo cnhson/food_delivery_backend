@@ -52,4 +52,38 @@ const Menu = sequelize.define(
   }
 );
 
-module.exports = { Menu };
+async function getProductByName(name){
+  try{
+    const data = await Menu.findAll({
+      where:{
+        name: {
+          [Op.like]: "%"+name+"%",
+        }
+      },
+    });
+    if (data.length > 0) 
+      return data;
+    else 
+      return null;
+  } catch (err)
+  {
+    console.error(err);
+    return null;
+  }
+}
+
+async function getAllProduct(){
+  try{
+    const data = await Menu.findAll();
+    if (data.length > 0) 
+      return data;
+    else 
+      return null;
+  } catch (err)
+  {
+    console.error(err);
+    return null;
+  }
+}
+
+module.exports = { Menu, getAllProduct, getProductByName };
