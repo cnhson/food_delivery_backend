@@ -1,18 +1,19 @@
 const { sequelize } = require("../services/common");
 const { DataTypes } = require("sequelize");
 
-const Order = sequelize.define(
-  "order",
+const orderDetail = sequelize.define(
+  "order_detail",
   {
     id: {
-      type: DataTypes.STRING(25),
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
       primaryKey: true,
     },
-    account_id: {
-      type: DataTypes.INTEGER,
+    ordder_id: {
+      type: DataTypes.STRING(25),
       allowNull: false,
       references: {
-        model: "account",
+        model: "order",
         key: "id",
       },
     },
@@ -29,26 +30,10 @@ const Order = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    timestamp: {
-      type: DataTypes.STRING(25),
-      allowNull: false,
-    },
-    payment_method: {
-      type: DataTypes.STRING(50),
-      allowNull: false,
-    },
-    status: {
-      type: DataTypes.STRING(25),
-      allowNull: false,
-      references: {
-        model: "status",
-        key: "id",
-      },
-    },
   },
   {
     timestamps: false,
   }
 );
 
-module.exports = { Order };
+module.exports = { orderDetail };
