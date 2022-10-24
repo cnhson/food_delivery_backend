@@ -19,7 +19,6 @@ createStore: async function (req, res, next) {
       const timestamp = req.body.timestamp;
         
         // Check store's name
-        const namecheck = await checkStoreByName(name);
         if(namecheck!= false){
         // Insert store into database
         const result = await insertStore(
@@ -34,10 +33,6 @@ createStore: async function (req, res, next) {
           if (result) {
             res.status(200).json({ message: "Create store successfully" });
           } 
-        }
-        else
-        {
-            res.status(200).json({ message: "Name exist" });
         }
     } catch (err) {
       res.status(500).send(err);

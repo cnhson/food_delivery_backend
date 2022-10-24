@@ -2,15 +2,14 @@ const express = require("express");
 const router = express.Router();
 const app = require("../controller");
 const account_route = require("./account_route");
-const menu = require("../controller/menu_controller");
-const store = require("../controller/store_controller");
+const menu_route = require("../menu_route");
+const store_route = require("../store_route");
 
 router.get("/init", app.Init);
 
 router.use("/account", account_route);
-router.get("/homepage", menu.listAllProducts);
-router.get("/search/:name",  menu.findProduct);
-router.post("/store/create", store.createStore);
+router.use("/menu", menu_route);
+router.use("/store", store_route);
 
 // router.get("*", (req, res) => {
 //   res.json("Welcome to food delivery app");
