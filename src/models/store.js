@@ -16,6 +16,9 @@ const Store = sequelize.define(
         key: "id",
       },
     },
+    name: {
+      type: DataTypes.STRING(255),
+    },
     address: {
       type: DataTypes.STRING(255),
       allowNull: false,
@@ -46,4 +49,40 @@ const Store = sequelize.define(
   }
 );
 
-module.exports = { Store };
+async function insertStore(owner_id, name, address, description, type_id, timestamp) {
+  try {
+    await Store.create({
+      owner_id: owner_id,
+      name: name,
+      address: address,
+      description: description,
+      type_id: type_id,
+      timestamp,
+    });
+
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+async function checkStoreByName(name) {
+  try {
+    const data = await Store.findAll({
+      where: {
+        name: name,
+      },
+    });
+    if (data.length > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+
+module.exports = { Store, insertStore, checkStoreByName };
