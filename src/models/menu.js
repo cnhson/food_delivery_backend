@@ -1,5 +1,6 @@
 const { sequelize } = require("../services/common");
 const { DataTypes } = require("sequelize");
+const { Op } = require("sequelize");
 
 const Menu = sequelize.define(
   "menu",
