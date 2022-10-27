@@ -4,12 +4,6 @@ module.exports = {
 
 createStore: async function (req, res, next) {
     try {
-    //   owner_id: owner_id,
-    //   name: name,
-    //   address: address,
-    //   description: description,
-    //   type_id: type_id,
-    //   timestamp,
 
       const owner_id = req.body.owner_id;
       const name = req.body.name;

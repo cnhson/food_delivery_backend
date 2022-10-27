@@ -51,4 +51,22 @@ const Order = sequelize.define(
   }
 );
 
-module.exports = { Order };
+async function insertOrder(account_id, product_id, quantity, payment_method, timestamp, status) {
+  try {
+    await Order.create({
+      account_id: account_id,
+      product_id: product_id,
+      quantity: quantity,
+      payment_method: payment_method,
+      status: status,
+      timestamp,
+    });
+
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+module.exports = { Order, insertOrder };

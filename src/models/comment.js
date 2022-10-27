@@ -51,4 +51,22 @@ const Comment = sequelize.define(
   }
 );
 
-module.exports = { Comment };
+async function insertComment(store_id, order_id, account_id, comment, image, star, timestamp) {
+  try {
+    await Comment.create({
+      store_id: store_id,
+      order_id: order_id,
+      account_id: account_id,
+      comment: comment,
+      image: image,
+      star: star,
+      timestamp,
+    });
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+module.exports = { Comment, insertComment };

@@ -53,7 +53,6 @@ async function insertAccount(role_id, name, email, password, timestamp) {
       del_fag: false,
       timestamp,
     });
-
     return true;
   } catch (err) {
     console.log(err);

@@ -9,7 +9,7 @@ module.exports = {
           return;
         }
           res.status(200).json(productlist);
-          console.log("successfully");
+          //console.log("successfully");
           return;
         } 
     catch (err) {
@@ -18,7 +18,7 @@ module.exports = {
         }
     },
 
-    findProduct: async function (req, res) {
+  findProduct: async function (req, res) {
     try {
         let productname =  req.params.name;
         if (productname === null) {
@@ -30,13 +30,13 @@ module.exports = {
             if(result != null)
             {
               res.status(200).json(result);
-              console.log("successfully");
+              //console.log("successfully");
               return;
             }
             else
             {
               res.status(200).json("No product found");
-              console.log("successfully");
+              //console.log("successfully");
               return;
             }
           }
