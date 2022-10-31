@@ -53,6 +53,29 @@ const Menu = sequelize.define(
   }
 );
 
+async function addProduct(id, store_id, name, description, type_id,  image, price)
+{
+  try{
+    await Menu.create({
+      id: id,
+      store_id: store_id,
+      name: name,
+      description: description,
+      type_id: type_id,
+      image: image,
+      price: price,
+      out_of_stock: false,
+      del_flag: false,
+    });
+    return true;
+  }
+  catch(err)
+  {
+    console.error(err);
+    return false;
+  }
+}
+
 async function getProductByName(name){
   try{
     const data = await Menu.findAll({
@@ -87,4 +110,4 @@ async function getAllProduct(){
   }
 }
 
-module.exports = { Menu, getAllProduct, getProductByName };
+module.exports = { Menu, getAllProduct, getProductByName, addProduct };
