@@ -1,6 +1,7 @@
 const { sequelize } = require("../services/common");
 const { DataTypes } = require("sequelize");
 const { Op } = require("sequelize");
+const { ProductType } = require("./product_type");
 
 const Menu = sequelize.define(
   "menu",
@@ -53,6 +54,13 @@ const Menu = sequelize.define(
   }
 );
 
+Menu.associate = () => {
+  Menu.hasMany(ProductType,
+    {foreignKey: 'id', sourceKey: 'type_id'}
+  );
+};
+Menu.associate();
+
 async function addProduct(id, store_id, name, description, type_id,  image, price)
 {
   try{
@@ -98,7 +106,13 @@ async function getProductByName(name){
 
 async function getAllProduct(){
   try{
-    const data = await Menu.findAll();
+    const data = await Menu.findAll({
+      attributes: ["id", "store_id", "name", "description", "image", "price", 'out_of_stock', "del_flag"],
+      include: [{
+          model: ProductType,
+          attributes: ["name"],
+     }],
+    });
     if (data.length > 0) 
       return data;
     else 

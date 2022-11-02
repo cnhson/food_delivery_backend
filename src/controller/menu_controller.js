@@ -9,7 +9,7 @@ const { getAllProduct, getProductByName, addProduct } = require("../models/menu"
 
 
 module.exports = {
-  createProduct: async function(req, res)
+  createProduct: async function(req, res, next)
   {
     try {
         const id = req.body.id;

@@ -1,10 +1,11 @@
-const { insertAccount, getAccountByEmail } = require("../models/account");
+const { insertAccount, getAccountByEmail, getAccountRoleByEmail } = require("../models/account");
 const bcrypt = require("bcryptjs");
 
 module.exports = {
-  registerAccount: async function (req, res, next) {
+  registerAccount: async function (req, res) {
     try {
-      const role_id = "";
+      let role_id = "";
+      const check = req.cus;
       const name = req.body.name;
       const email = req.body.email;
       const password = req.body.password;
@@ -12,10 +13,10 @@ module.exports = {
       let hashedPassword = "";
 
       //Get role according to the url
-      if (res.locals.cus) {
+      if (check) {
         role_id = "CUS";
       }
-      else if(res.locals.sel)
+      else
       {
         role_id = "SEL";
       }
@@ -48,7 +49,7 @@ module.exports = {
         });
       });
     } catch (err) {
-      res.status(500).send(err);
+      res.status(500).send("Error");
     }
   },
 
@@ -75,14 +76,23 @@ module.exports = {
           res.status(200).json({ error: "Password is incorrect" });
           return;
         }
+        const role = getAccountRoleByEmail(email);
 
-        res.status(200).json({ message: "Login successfully" });
-        console.log("successfully");
-        return;
+        //Redirect to specific url depending on role after succesful login
+        if(role === "CUS")
+        {
+          res.redirect("/homepage");
+          return;
+        }
+        else {
+          res.redirect("/store");
+          return;
+        }
       });
     } catch (err) {
       console.log(err);
       res.status(500).send(err);
     }
   },
+
 };
