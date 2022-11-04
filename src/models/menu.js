@@ -1,7 +1,8 @@
 const { sequelize } = require("../services/common");
-const { DataTypes } = require("sequelize");
+const { DataTypes, QueryTypes  } = require("sequelize");
 const { Op } = require("sequelize");
 const { ProductType } = require("./product_type");
+const { Store } = require("./store");
 
 const Menu = sequelize.define(
   "menu",
@@ -54,13 +55,6 @@ const Menu = sequelize.define(
   }
 );
 
-Menu.associate = () => {
-  Menu.hasMany(ProductType,
-    {foreignKey: 'id', sourceKey: 'type_id'}
-  );
-};
-Menu.associate();
-
 async function addProduct(id, store_id, name, description, type_id,  image, price)
 {
   try{
@@ -87,9 +81,15 @@ async function addProduct(id, store_id, name, description, type_id,  image, pric
 async function getProductByName(name){
   try{
     const data = await Menu.findAll({
-      where:{
-        name: {
-          [Op.like]: "%"+name+"%",
+      attributes: ["id", "store_id", "name", "description", "image", "price", 'out_of_stock', "del_flag"],
+      include: {
+          model: ProductType,
+          attributes: ["name"],
+     },
+      where:
+      {
+      name: {
+        [Op.like]: "%"+name+"%",
         }
       },
     });
@@ -108,10 +108,10 @@ async function getAllProduct(){
   try{
     const data = await Menu.findAll({
       attributes: ["id", "store_id", "name", "description", "image", "price", 'out_of_stock', "del_flag"],
-      include: [{
+      include: {
           model: ProductType,
           attributes: ["name"],
-     }],
+     },
     });
     if (data.length > 0) 
       return data;
@@ -124,4 +124,46 @@ async function getAllProduct(){
   }
 }
 
-module.exports = { Menu, getAllProduct, getProductByName, addProduct };
+async function getProductDetail(id){
+  try{
+    //Filter product info
+    const p_info = await sequelize.query(
+      "SELECT m.id, m.name, m.description 'des', p.name 'type', m.image, price, m.out_of_stock, m.del_flag "+
+      "from menu m inner join product_type p on m.type_id = p.id inner join store s on m.store_id = s.id where m.id = ?",
+      {
+        replacements: [id],
+        type: QueryTypes.SELECT,
+      }
+    );
+    //Filter product store
+    const p_store  = await sequelize.query(
+      "SELECT s.id 'sid', owner_id, s.name 'sname', s.address, s.description 'sdes', s.type_id 'stype', s.active_date "+
+      "from menu m inner join product_type p on m.type_id = p.id inner join store s on m.store_id = s.id where m.id = ?",
+      {
+        replacements: [id],
+        type: QueryTypes.SELECT,
+      }
+    );
+    if (p_info.length > 0 && p_store.length > 0) 
+      {
+        //Save before deleteing id, bring [id] out the be the main key
+        let id = p_info[0].id;
+        delete (p_info[0].id);
+        let product_res = {
+          "id": id,
+          "info": p_info[0],
+          "store": p_store[0],
+        };
+        return product_res;
+        console.log(product_res);
+      }
+    else 
+      return null;
+  } catch (err)
+  {
+    console.error(err);
+    return null;
+  }
+}
+
+module.exports = { Menu, getAllProduct, getProductByName, addProduct, getProductDetail };

@@ -1,4 +1,4 @@
-const { getAllProduct, getProductByName, addProduct } = require("../models/menu");
+const { getAllProduct, getProductByName, addProduct, getProductDetail } = require("../models/menu");
 
 // store_id= store_id
 // name= name
@@ -97,4 +97,31 @@ module.exports = {
         res.status(500).send(err);
         }
     },
+
+    productInfo: async function (req, res) {
+      try {
+          let productid =  req.params.pid;
+          if (productid === null) {
+            res.status(200).json({ error: "Please input a product id" });
+            return;
+          } else
+            {
+              let result = await getProductDetail(productid);
+              if(result != null)
+              {
+                res.status(200).json(result);
+                return;
+              }
+              else
+              {
+                res.status(200).json("Product not found");
+                return;
+              }
+            }
+          } 
+      catch (err) {
+          console.log("err");
+          res.status(500).send(err);
+          }
+      },
 };
