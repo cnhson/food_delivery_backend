@@ -68,7 +68,7 @@ async function getAccountByEmail(email) {
       },
     });
     if (data.length > 0) {
-      return data[0];
+      return data;
     } else {
       return null;
     }
@@ -78,20 +78,4 @@ async function getAccountByEmail(email) {
   }
 }
 
-async function getAccountRoleByEmail(email) {
-  try {
-    const data = await Account.findAll({
-      attributes: ['role_id']
-    });
-    if (data.length > 0) {
-      return data[0];
-    } else {
-      return null;
-    }
-  } catch (err) {
-    console.log(err);
-    return null;
-  }
-}
-
-module.exports = { Account, insertAccount, getAccountByEmail, getAccountRoleByEmail };
+module.exports = { Account, insertAccount, getAccountByEmail};

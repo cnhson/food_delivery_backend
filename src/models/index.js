@@ -6,7 +6,7 @@ const { Order } = require("./order");
 const { Comment } = require("./comment");
 const { Account } = require("./account");
 
-console.clear();
+//console.clear();
 
 sequelize
   .authenticate()

@@ -51,15 +51,16 @@ const Order = sequelize.define(
   }
 );
 
-async function insertOrder(account_id, product_id, quantity, payment_method, timestamp, status) {
+async function insertOrder(id, account_id, product_id, quantity, payment_method, timestamp) {
   try {
     await Order.create({
+      id: id,
       account_id: account_id,
       product_id: product_id,
       quantity: quantity,
       payment_method: payment_method,
-      status: status,
-      timestamp,
+      status: "received",
+      timestamp: timestamp,
     });
 
     return true;
@@ -69,4 +70,21 @@ async function insertOrder(account_id, product_id, quantity, payment_method, tim
   }
 }
 
-module.exports = { Order, insertOrder };
+async function getUserOrderByIds(id, account_id) {
+  try {
+    const data = await Order.findAll({
+      where: {
+        id: id,
+        account_id: account_id,
+      },
+      attributes: ["id","account_id","product_id","status"],
+    });
+
+    return data;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+
+module.exports = { Order, insertOrder, getUserOrderByIds };

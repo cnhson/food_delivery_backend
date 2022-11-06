@@ -129,7 +129,7 @@ async function getProductDetail(id){
     //Filter product info
     const p_info = await sequelize.query(
       "SELECT m.id, m.name, m.description 'des', p.name 'type', m.image, price, m.out_of_stock, m.del_flag "+
-      "from menu m inner join product_type p on m.type_id = p.id inner join store s on m.store_id = s.id where m.id = ?",
+      "from menu m inner join product_type p on m.type_id = p.id where m.id = ?",
       {
         replacements: [id],
         type: QueryTypes.SELECT,
@@ -138,7 +138,7 @@ async function getProductDetail(id){
     //Filter product store
     const p_store  = await sequelize.query(
       "SELECT s.id 'sid', owner_id, s.name 'sname', s.address, s.description 'sdes', s.type_id 'stype', s.active_date "+
-      "from menu m inner join product_type p on m.type_id = p.id inner join store s on m.store_id = s.id where m.id = ?",
+      "from menu m inner join store s on m.store_id = s.id where m.id = ?",
       {
         replacements: [id],
         type: QueryTypes.SELECT,
@@ -146,7 +146,7 @@ async function getProductDetail(id){
     );
     if (p_info.length > 0 && p_store.length > 0) 
       {
-        //Save before deleteing id, bring [id] out the be the main key
+        //Save before deleting id, bring [id] out to be the main key
         let id = p_info[0].id;
         delete (p_info[0].id);
         let product_res = {
@@ -155,7 +155,7 @@ async function getProductDetail(id){
           "store": p_store[0],
         };
         return product_res;
-        console.log(product_res);
+        //console.log(product_res);
       }
     else 
       return null;

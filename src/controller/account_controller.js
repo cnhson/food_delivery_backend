@@ -1,7 +1,15 @@
-const { insertAccount, getAccountByEmail, getAccountRoleByEmail } = require("../models/account");
+const { insertAccount, getAccountByEmail } = require("../models/account");
 const bcrypt = require("bcryptjs");
+const session = require('express-session');
 
 module.exports = {
+
+  test: async function (req, res)  {
+    const bemail = req.session.User.email;
+    const bpassword = req.session.User.password;
+    res.send({bemail, bpassword})
+  },
+
   registerAccount: async function (req, res) {
     try {
       let role_id = "";
@@ -64,8 +72,8 @@ module.exports = {
         res.status(200).json({ error: "This account does not exists" });
         return;
       }
-      account = account.dataValues;
-      const hashedPassword = account.password;
+      //console.log(account[0].password);
+      const hashedPassword = account[0].password;
       bcrypt.compare(password, hashedPassword, function (err, isMatch) {
         if (err) {
           res.status(200).json({ error: err });
@@ -76,17 +84,31 @@ module.exports = {
           res.status(200).json({ error: "Password is incorrect" });
           return;
         }
-        const role = getAccountRoleByEmail(email);
+        //Get role from above data
+        const role = account[0].role;
+
+        //Create session
+        req.session.User = {
+          id: account[0].id,
+          name: account[0].name,
+          email: account[0].email,
+          password: account[0].password,
+          role: "CUS",
+        }
 
         //Redirect to specific url depending on role after succesful login
         if(role === "CUS")
         {
-          res.redirect("/homepage");
-          return;
+          req.session.save(() => {
+            res.redirect('/menu/products')
+          });
+          console.log(req.session);
         }
         else {
-          res.redirect("/store");
-          return;
+          req.session.save(() => {
+            res.redirect('/menu/products')
+          });
+          console.log(req.session);
         }
       });
     } catch (err) {

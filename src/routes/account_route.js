@@ -3,6 +3,7 @@ const account = require("../controller/account_controller");
 
 
 router.post("/login", account.loginAccount);
+router.post("/test", account.test);
 
 router.post("/register/customer" , function(req, res, next){ 
     req.cus = true,
