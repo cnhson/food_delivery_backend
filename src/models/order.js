@@ -77,7 +77,7 @@ async function insertOrder(
   }
 }
 
-async function getUserOrderByIds(id, account_id) {
+async function checkExistUserOrder(id, account_id) {
   try {
     const data = await Order.findAll({
       where: {
