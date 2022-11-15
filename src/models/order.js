@@ -1,5 +1,5 @@
 const { sequelize } = require("../services/common");
-const { DataTypes } = require("sequelize");
+const { DataTypes, Op } = require("sequelize");
 
 const Order = sequelize.define(
   "order",
@@ -51,7 +51,14 @@ const Order = sequelize.define(
   }
 );
 
-async function insertOrder(id, account_id, product_id, quantity, payment_method, timestamp) {
+async function insertOrder(
+  id,
+  account_id,
+  product_id,
+  quantity,
+  payment_method,
+  timestamp
+) {
   try {
     await Order.create({
       id: id,
@@ -77,7 +84,7 @@ async function getUserOrderByIds(id, account_id) {
         id: id,
         account_id: account_id,
       },
-      attributes: ["id","account_id","product_id","status"],
+      attributes: ["id", "account_id", "product_id", "status"],
     });
 
     return data;
@@ -87,4 +94,44 @@ async function getUserOrderByIds(id, account_id) {
   }
 }
 
-module.exports = { Order, insertOrder, getUserOrderByIds };
+async function checkExistUserOrder(id, account_id) {
+  try {
+    const data = await Order.findAll({
+      where: {
+        id: id,
+        account_id: account_id,
+      },
+      attributes: ["id", "account_id", "product_id", "status"],
+    });
+
+    return data;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+
+async function getUserOrderList(account_id, status) {
+  try {
+    const data = await Order.findAll({
+      where: {
+        account_id: account_id,
+        status: {
+          [Op.like]: "%" + status + "%",
+        },
+      },
+    });
+
+    return data;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+
+module.exports = {
+  Order,
+  insertOrder,
+  checkExistUserOrder,
+  getUserOrderList,
+};
