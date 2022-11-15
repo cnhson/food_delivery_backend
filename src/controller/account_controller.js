@@ -1,34 +1,23 @@
 const { insertAccount, getAccountByEmail } = require("../models/account");
 const bcrypt = require("bcryptjs");
-const session = require('express-session');
+const session = require("express-session");
 
 module.exports = {
-
-  test: async function (req, res)  {
+  test: async function (req, res) {
     const bemail = req.session.User.email;
     const bpassword = req.session.User.password;
-    res.send({bemail, bpassword})
+    res.send({ bemail, bpassword });
   },
 
   registerAccount: async function (req, res) {
     try {
-      let role_id = "";
-      const check = req.cus;
+      const role_id = req.body.role;
       const name = req.body.name;
       const email = req.body.email;
       const password = req.body.password;
       const timestamp = req.body.timestamp;
       let hashedPassword = "";
 
-      //Get role according to the url
-      if (check) {
-        role_id = "CUS";
-      }
-      else
-      {
-        role_id = "SEL";
-      }
-      
       // Hash password
       bcrypt.genSalt(10, function (err, Salt) {
         bcrypt.hash(password, Salt, async function (err, hash) {
@@ -94,19 +83,17 @@ module.exports = {
           email: account[0].email,
           password: account[0].password,
           role: "CUS",
-        }
+        };
 
         //Redirect to specific url depending on role after succesful login
-        if(role === "CUS")
-        {
+        if (role === "CUS") {
           req.session.save(() => {
-            res.redirect('/menu/products')
+            res.redirect("/menu/products");
           });
           console.log(req.session);
-        }
-        else {
+        } else {
           req.session.save(() => {
-            res.redirect('/menu/products')
+            res.redirect("/menu/products");
           });
           console.log(req.session);
         }
@@ -116,5 +103,4 @@ module.exports = {
       res.status(500).send(err);
     }
   },
-
 };
