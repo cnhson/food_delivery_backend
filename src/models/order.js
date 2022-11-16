@@ -1,5 +1,6 @@
 const { sequelize } = require("../services/common");
 const { DataTypes, Op } = require("sequelize");
+const { orderDetail } = require("./order_detail");
 
 const Order = sequelize.define(
   "order",
@@ -16,19 +17,27 @@ const Order = sequelize.define(
         key: "id",
       },
     },
-    product_id: {
-      type: DataTypes.STRING(25),
-      allowNull: false,
-      primaryKey: true,
-      references: {
-        model: "menu",
-        type: "id",
-      },
-    },
-    quantity: {
-      type: DataTypes.STRING,
+    price: {
+      type: DataTypes.STRING(50),
       allowNull: false,
     },
+    ship_fee: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+    },
+    // product_id: {
+    //   type: DataTypes.STRING(25),
+    //   allowNull: false,
+    //   primaryKey: true,
+    //   references: {
+    //     model: "menu",
+    //     type: "id",
+    //   },
+    // },
+    // quantity: {
+    //   type: DataTypes.STRING,
+    //   allowNull: false,
+    // },
     timestamp: {
       type: DataTypes.STRING(25),
       allowNull: false,
@@ -54,8 +63,8 @@ const Order = sequelize.define(
 async function insertOrder(
   id,
   account_id,
-  product_id,
-  quantity,
+  price,
+  ship_fee,
   payment_method,
   timestamp
 ) {
@@ -63,8 +72,8 @@ async function insertOrder(
     await Order.create({
       id: id,
       account_id: account_id,
-      product_id: product_id,
-      quantity: quantity,
+      price: price,
+      ship_fee: ship_fee,
       payment_method: payment_method,
       status: "received",
       timestamp: timestamp,
@@ -84,24 +93,7 @@ async function checkExistUserOrder(id, account_id) {
         id: id,
         account_id: account_id,
       },
-      attributes: ["id", "account_id", "product_id", "status"],
-    });
-
-    return data;
-  } catch (err) {
-    console.log(err);
-    return null;
-  }
-}
-
-async function checkExistUserOrder(id, account_id) {
-  try {
-    const data = await Order.findAll({
-      where: {
-        id: id,
-        account_id: account_id,
-      },
-      attributes: ["id", "account_id", "product_id", "status"],
+      attributes: ["id", "account_id", "price", "status"],
     });
 
     return data;
@@ -114,6 +106,10 @@ async function checkExistUserOrder(id, account_id) {
 async function getUserOrderList(account_id, status) {
   try {
     const data = await Order.findAll({
+      include: {
+        model: orderDetail,
+        attributes: ["product_id", "quantity"],
+      },
       where: {
         account_id: account_id,
         status: {
@@ -121,7 +117,6 @@ async function getUserOrderList(account_id, status) {
         },
       },
     });
-
     return data;
   } catch (err) {
     console.log(err);

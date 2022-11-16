@@ -1,4 +1,5 @@
 const { insertOrder, getUserOrderList } = require("../models/order");
+const { insertOrderDetail } = require("../models/order_detail");
 
 // account_id: account_id,
 // product_id: product_id,
@@ -12,24 +13,31 @@ module.exports = {
     try {
       const uid = req.session.User.id;
       const product_id = req.body.product_id;
+
       // Create order's id
       // ex: { user_id: 1, product_id: 9 }
       // oid = u1p9
+
       const id = "u" + uid + "p" + product_id;
       const account_id = req.body.account_id;
       const quantity = req.body.quantity;
       const payment_method = req.body.payment_method;
-      const timestamp = Date.now();
+      const price = req.body.price;
+      const ship_fee = req.body.ship_fee;
+      const timestamp = req.body.timestamp;
 
-      // Insert order into database
-      const result = await insertOrder(
+      const result1 = insertOrder(
         id,
         account_id,
-        product_id,
-        quantity,
+        price,
+        ship_fee,
         payment_method,
         timestamp
       );
+
+      const result2 = insertOrderDetail(id, account_id, product_id, quantity);
+
+      const result = await Promise.all([result1, result2]);
 
       if (result) {
         res.status(200).json({ message: "Create order successfully" });
