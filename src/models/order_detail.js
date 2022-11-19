@@ -36,11 +36,10 @@ const orderDetail = sequelize.define(
   }
 );
 
-async function insertOrderDetail(id, account_id, product_id, quantity) {
+async function insertOrderDetail(order_id, product_id, quantity) {
   try {
-    await Order.create({
-      id: id,
-      account_id: account_id,
+    await orderDetail.create({
+      order_id: order_id,
       product_id: product_id,
       quantity: quantity,
     });

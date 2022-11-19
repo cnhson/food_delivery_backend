@@ -11,15 +11,12 @@ const { insertOrderDetail } = require("../models/order_detail");
 module.exports = {
   createOrder: async function (req, res) {
     try {
-      const uid = req.session.User.id;
+      const account_id = req.session.User.id;
       const product_id = req.body.product_id;
 
       // Create order's id
-      // ex: { user_id: 1, product_id: 9 }
-      // oid = u1p9
 
-      const id = "u" + uid + "p" + product_id;
-      const account_id = req.body.account_id;
+      const id = "U" + account_id + product_id;
       const quantity = req.body.quantity;
       const payment_method = req.body.payment_method;
       const price = req.body.price;
@@ -35,7 +32,7 @@ module.exports = {
         timestamp
       );
 
-      const result2 = insertOrderDetail(id, account_id, product_id, quantity);
+      const result2 = insertOrderDetail(id, product_id, quantity);
 
       const result = await Promise.all([result1, result2]);
 

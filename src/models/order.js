@@ -86,14 +86,15 @@ async function insertOrder(
   }
 }
 
-async function checkExistUserOrder(id, account_id) {
+async function getExistUserOrder(account_id, store_id, product_id) {
   try {
-    const data = await Order.findAll({
+    const data = await Order.findOne({
       where: {
-        id: id,
+        id: {
+          [Op.like]: "%S%" + store_id + "%P%" + product_id,
+        },
         account_id: account_id,
       },
-      attributes: ["id", "account_id", "price", "status"],
     });
 
     return data;
@@ -127,6 +128,6 @@ async function getUserOrderList(account_id, status) {
 module.exports = {
   Order,
   insertOrder,
-  checkExistUserOrder,
+  getExistUserOrder,
   getUserOrderList,
 };

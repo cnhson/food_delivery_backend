@@ -5,6 +5,8 @@ const {
   getProductDetail,
 } = require("../models/menu");
 
+const { getCommentsListFromStore } = require("../models/comment");
+
 // store_id= store_id
 // name= name
 // description= description
@@ -13,15 +15,28 @@ const {
 // price= price
 
 module.exports = {
+  test: async function (req, res) {
+    const oid = req.params.oid;
+    console.log(oid);
+    res.status(200).json("menu:" + oid);
+  },
+
   createProduct: async function (req, res, next) {
     try {
-      const id = req.body.id;
+      const pid = req.body.id;
       const store_id = req.body.store_id;
       const name = req.body.name;
       const description = req.body.description;
       const type_id = req.body.type_id;
       const image = req.body.image;
       const price = req.body.price;
+
+      const product_id = gfl(name);
+
+      //("id").split(/[A-Z]/).filter(Boolean) => "S" + pid + "P" + product_id
+      // Create product's id
+
+      const id = "S" + pid + "P" + product_id;
 
       if (store_id === null || type_id === null || id === null) {
         res.status(200).json({ error: "Check id again" });
@@ -76,11 +91,9 @@ module.exports = {
         let result = await getProductByName(productname);
         if (result != null) {
           res.status(200).json(result);
-          //console.log("successfully");
           return;
         } else {
           res.status(200).json("No product found");
-          //console.log("successfully");
           return;
         }
       }
@@ -97,9 +110,11 @@ module.exports = {
         res.status(200).json({ error: "Please input a product id" });
         return;
       } else {
-        let result = await getProductDetail(productid);
-        if (result != null) {
-          res.status(200).json(result);
+        let product = await getProductDetail(productid);
+        if (product != null) {
+          let feedback = await getCommentsListFromStore(product.store.sid);
+          const feedbackcount = feedback.length;
+          res.status(200).json({ product, feedbackcount, feedback });
           return;
         } else {
           res.status(200).json("Product not found");
@@ -112,3 +127,13 @@ module.exports = {
     }
   },
 };
+
+//get first letters from string
+function gfl(str) {
+  const firstLetters = str
+    .split(" ")
+    .map((word) => word[0])
+    .join("");
+
+  return firstLetters;
+}

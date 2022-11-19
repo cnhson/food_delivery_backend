@@ -12,6 +12,6 @@ router.use("/account", account_route);
 router.use("/menu", menu_route);
 router.use("/store", store_route);
 router.use("/order", order_route);
-router.use("/comment", comment_route);
+router.use("/feedback", comment_route);
 
 module.exports = router;

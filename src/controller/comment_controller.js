@@ -13,30 +13,22 @@ const { checkExistUserOrder } = require("../models/order");
 // updatedAt
 
 module.exports = {
-  test: async function (req, res) {
-    const user_id = 1;
-    const order_id = req.params.oid;
-    console.log(user_id + order_id + " \n");
-    console.log(check[0].status);
-    res.status(200).json({ message: "Worked" });
-  },
-
   createComment: async function (req, res, next) {
     try {
-      const user_id = req.session.User.id;
-      const order_id = req.params.oid;
-      const check = await checkExistUserOrder(order_id, user_id);
-      if (check === null && check === undefined) {
+      const account_id = req.session.User.id;
+      const store_id = req.body.store_id;
+      const product_id = req.body.product_id;
+      const check = await checkExistUserOrder(user_id, store_id, product_id);
+      if (check === null || check === undefined) {
         res.status(200).json({ message: "Please order first!!" });
         return;
-      } else if (check[0].status != "received") {
+      } else if (check.status != "received") {
         res
           .status(200)
           .json({ message: "You haven't received the order yet!!" });
         return;
       } else {
-        const store_id = req.body.store_id;
-        const account_id = req.body.account_id;
+        const order_id = check.id;
         const comment = req.body.comment;
         const image = req.body.image;
         const star = req.body.star;
@@ -67,11 +59,10 @@ module.exports = {
 
   editComment: async function (req, res, next) {
     try {
-      const user_id = req.session.User.id;
-      const order_id = req.params.oid;
+      const account_id = req.session.User.id;
+      const order_id = req.body.order_id;
 
       const store_id = req.body.store_id;
-      const account_id = req.body.account_id;
       const comment = req.body.comment;
       const image = req.body.image;
       const star = req.body.star;

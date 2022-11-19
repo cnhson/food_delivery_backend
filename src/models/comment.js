@@ -57,7 +57,16 @@ const Comment = sequelize.define(
   }
 );
 
-async function insertComment(store_id, order_id, account_id, comment, image, star, timestamp, createdAt) {
+async function insertComment(
+  store_id,
+  order_id,
+  account_id,
+  comment,
+  image,
+  star,
+  timestamp,
+  createdAt
+) {
   try {
     await Comment.create({
       store_id: store_id,
@@ -77,7 +86,16 @@ async function insertComment(store_id, order_id, account_id, comment, image, sta
   }
 }
 
-async function updateComment(store_id, order_id, account_id, comment, image, star, timestamp, updatedAt) {
+async function updateComment(
+  store_id,
+  order_id,
+  account_id,
+  comment,
+  image,
+  star,
+  timestamp,
+  updatedAt
+) {
   try {
     await Comment.update({
       comment: comment,
@@ -98,4 +116,23 @@ async function updateComment(store_id, order_id, account_id, comment, image, sta
   }
 }
 
-module.exports = { Comment, insertComment, updateComment };
+async function getCommentsListFromStore(store_id) {
+  try {
+    const data = await Comment.findAll({
+      where: {
+        store_id: store_id,
+      },
+    });
+    return data;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+
+module.exports = {
+  Comment,
+  insertComment,
+  updateComment,
+  getCommentsListFromStore,
+};
