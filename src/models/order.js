@@ -1,5 +1,5 @@
 const { sequelize } = require("../services/common");
-const { DataTypes, Op } = require("sequelize");
+const { DataTypes, Op, QueryTypes } = require("sequelize");
 const { orderDetail } = require("./order_detail");
 
 const Order = sequelize.define(
@@ -86,14 +86,13 @@ async function insertOrder(
   }
 }
 
-async function getExistUserOrder(account_id, store_id, product_id) {
+async function getExistUserOrder(account_id, product_id) {
   try {
     const data = await Order.findOne({
+      include: { model: orderDetail },
       where: {
-        id: {
-          [Op.like]: "%S%" + store_id + "%P%" + product_id,
-        },
         account_id: account_id,
+        product_id: product_id,
       },
     });
 
@@ -125,9 +124,31 @@ async function getUserOrderList(account_id, status) {
   }
 }
 
+async function calculateTotal(store_id, mil1, mil2) {
+  try {
+    const data = await sequelize.query(
+      "select sum(price*quantity) 'total_sum' from food_delivery.order o inner join order_detail od on o.id = od.order_id where o.id like '%S%" +
+        store_id +
+        "%O%' and (timestamp between " +
+        mil1 +
+        " and " +
+        mil2 +
+        ")",
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+    return data;
+  } catch (err) {
+    console.log(err);
+    return 0;
+  }
+}
+
 module.exports = {
   Order,
   insertOrder,
   getExistUserOrder,
   getUserOrderList,
+  calculateTotal,
 };

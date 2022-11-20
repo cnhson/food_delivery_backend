@@ -1,5 +1,5 @@
 const { sequelize } = require("../services/common");
-const { DataTypes, QueryTypes  } = require("sequelize");
+const { DataTypes, QueryTypes } = require("sequelize");
 const { Op } = require("sequelize");
 const { ProductType } = require("./product_type");
 const { Store } = require("./store");
@@ -8,7 +8,8 @@ const Menu = sequelize.define(
   "menu",
   {
     id: {
-      type: DataTypes.STRING(25),
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
       primaryKey: true,
     },
     store_id: {
@@ -55,11 +56,9 @@ const Menu = sequelize.define(
   }
 );
 
-async function addProduct(id, store_id, name, description, type_id,  image, price)
-{
-  try{
+async function addProduct(store_id, name, description, type_id, image, price) {
+  try {
     await Menu.create({
-      id: id,
       store_id: store_id,
       name: name,
       description: description,
@@ -70,100 +69,111 @@ async function addProduct(id, store_id, name, description, type_id,  image, pric
       del_flag: false,
     });
     return true;
-  }
-  catch(err)
-  {
+  } catch (err) {
     console.error(err);
     return false;
   }
 }
 
-async function getProductByName(name){
-  try{
+async function getProductByName(name) {
+  try {
     const data = await Menu.findAll({
-      attributes: ["id", "store_id", "name", "description", "image", "price", 'out_of_stock', "del_flag"],
+      attributes: [
+        "id",
+        "store_id",
+        "name",
+        "description",
+        "image",
+        "price",
+        "out_of_stock",
+        "del_flag",
+      ],
       include: {
-          model: ProductType,
-          attributes: ["name"],
-     },
-      where:
-      {
-      name: {
-        [Op.like]: "%"+name+"%",
-        }
+        model: ProductType,
+        attributes: ["name"],
+      },
+      where: {
+        name: {
+          [Op.like]: "%" + name + "%",
+        },
       },
     });
-    if (data.length > 0) 
-      return data;
-    else 
-      return null;
-  } catch (err)
-  {
+    if (data.length > 0) return data;
+    else return null;
+  } catch (err) {
     console.error(err);
     return null;
   }
 }
 
-async function getAllProduct(){
-  try{
+async function getAllProduct() {
+  try {
     const data = await Menu.findAll({
-      attributes: ["id", "store_id", "name", "description", "image", "price", 'out_of_stock', "del_flag"],
+      attributes: [
+        "id",
+        "store_id",
+        "name",
+        "description",
+        "image",
+        "price",
+        "out_of_stock",
+        "del_flag",
+      ],
       include: {
-          model: ProductType,
-          attributes: ["name"],
-     },
+        model: ProductType,
+        attributes: ["name"],
+      },
     });
-    if (data.length > 0) 
-      return data;
-    else 
-      return null;
-  } catch (err)
-  {
+    if (data.length > 0) return data;
+    else return null;
+  } catch (err) {
     console.error(err);
     return null;
   }
 }
 
-async function getProductDetail(id){
-  try{
+async function getProductDetail(id) {
+  try {
     //Filter product info
     const p_info = await sequelize.query(
-      "SELECT m.id, m.name, m.description 'des', p.name 'type', m.image, price, m.out_of_stock, m.del_flag "+
-      "from menu m inner join product_type p on m.type_id = p.id where m.id = ?",
+      "SELECT m.id, m.name, m.description 'des', p.name 'type', m.image, price, m.out_of_stock, m.del_flag " +
+        "from menu m inner join product_type p on m.type_id = p.id where m.id = ?",
       {
         replacements: [id],
         type: QueryTypes.SELECT,
       }
     );
     //Filter product store
-    const p_store  = await sequelize.query(
-      "SELECT s.id 'sid', owner_id, s.name 'sname', s.address, s.description 'sdes', s.type_id 'stype', s.active_date "+
-      "from menu m inner join store s on m.store_id = s.id where m.id = ?",
+    const p_store = await sequelize.query(
+      "SELECT s.id 'sid', owner_id, s.name 'sname', s.address, s.description 'sdes', s.type_id 'stype', s.active_date " +
+        "from menu m inner join store s on m.store_id = s.id where m.id = ?",
       {
         replacements: [id],
         type: QueryTypes.SELECT,
       }
     );
-    if (p_info.length > 0 && p_store.length > 0) 
-      {
-        //Save before deleting id, bring [id] out to be the main key
-        let id = p_info[0].id;
-        delete (p_info[0].id);
-        let product_res = {
-          "id": id,
-          "info": p_info[0],
-          "store": p_store[0],
-        };
-        return product_res;
-        //console.log(product_res);
-      }
-    else 
-      return null;
-  } catch (err)
-  {
+    if (p_info.length > 0 && p_store.length > 0) {
+      //Save before deleting id, bring [id] out to be the main key
+      let id = p_info[0].id;
+      delete p_info[0].id;
+      let product_res = {
+        id: id,
+        info: p_info[0],
+        store: p_store[0],
+      };
+      return product_res;
+      //console.log(product_res);
+    } else return null;
+  } catch (err) {
     console.error(err);
     return null;
   }
 }
 
-module.exports = { Menu, getAllProduct, getProductByName, addProduct, getProductDetail };
+module.exports = {
+  Menu,
+  getAllProduct,
+  getProductByName,
+  addProduct,
+  getProductDetail,
+};

@@ -23,7 +23,6 @@ module.exports = {
 
   createProduct: async function (req, res, next) {
     try {
-      const pid = req.body.id;
       const store_id = req.body.store_id;
       const name = req.body.name;
       const description = req.body.description;
@@ -33,17 +32,11 @@ module.exports = {
 
       const product_id = gfl(name);
 
-      //("id").split(/[A-Z]/).filter(Boolean) => "S" + pid + "P" + product_id
-      // Create product's id
-
-      const id = "S" + pid + "P" + product_id;
-
       if (store_id === null || type_id === null || id === null) {
         res.status(200).json({ error: "Check id again" });
         return;
       } else {
         const result = await addProduct(
-          id,
           store_id,
           name,
           description,

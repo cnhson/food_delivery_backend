@@ -1,5 +1,5 @@
 const { insertComment, updateComment } = require("../models/comment");
-const { checkExistUserOrder } = require("../models/order");
+const { getExistUserOrder } = require("../models/order");
 
 //id
 // store_id:
@@ -18,7 +18,7 @@ module.exports = {
       const account_id = req.session.User.id;
       const store_id = req.body.store_id;
       const product_id = req.body.product_id;
-      const check = await checkExistUserOrder(user_id, store_id, product_id);
+      const check = await getExistUserOrder(user_id, product_id);
       if (check === null || check === undefined) {
         res.status(200).json({ message: "Please order first!!" });
         return;

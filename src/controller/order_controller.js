@@ -1,5 +1,10 @@
-const { insertOrder, getUserOrderList } = require("../models/order");
+const {
+  insertOrder,
+  getUserOrderList,
+  calculateTotal,
+} = require("../models/order");
 const { insertOrderDetail } = require("../models/order_detail");
+const crypto = require("crypto");
 
 // account_id: account_id,
 // product_id: product_id,
@@ -9,18 +14,49 @@ const { insertOrderDetail } = require("../models/order_detail");
 // timestamp,
 
 module.exports = {
+  calculate: async function (req, res) {
+    try {
+      const store_id = req.body.store_id;
+      const str_date1 = req.body.date1;
+      const str_date2 = req.body.date2;
+      let mil1 = 0;
+      let mil2 = 0;
+      if (str_date2.length === 0) {
+        mil1 = Date.parse(str_date1 + " 00:00:00");
+        mil2 = Date.parse(str_date1 + " 23:59:59");
+        console.log(mil1 + "\n" + mil2);
+      } else {
+        mil1 = Date.parse(str_date1 + " 00:00:00");
+        mil2 = Date.parse(str_date2 + " 23:59:59");
+        console.log(mil1 + "\n" + mil2);
+      }
+      const totalprice = await calculateTotal(store_id, mil1, mil2);
+      res.status(200).json(totalprice);
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+
+  test: async function (req, res) {
+    const rid1 = crypto.randomBytes(3).toString("hex");
+    const rid2 = crypto.randomBytes(3).toString("hex");
+    res.status(200).json({ r1: rid1, r2: rid2 });
+  },
+
   createOrder: async function (req, res) {
     try {
       const account_id = req.session.User.id;
+      const store_id = req.body.store_id;
       const product_id = req.body.product_id;
-
+      // create random order id - length(6)
+      const oid = crypto.randomBytes(3).toString("hex");
+      const final_id = "S" + store_id + "O" + oid;
       // Create order's id
-
-      const id = "U" + account_id + product_id;
+      const id = final_id;
       const quantity = req.body.quantity;
       const payment_method = req.body.payment_method;
-      const price = req.body.price;
       const ship_fee = req.body.ship_fee;
+      const price = req.body.price;
       const timestamp = req.body.timestamp;
 
       const result1 = insertOrder(

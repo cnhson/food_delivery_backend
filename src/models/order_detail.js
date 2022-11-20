@@ -18,7 +18,7 @@ const orderDetail = sequelize.define(
       },
     },
     product_id: {
-      type: DataTypes.STRING(25),
+      type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
       references: {
