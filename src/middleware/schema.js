@@ -18,7 +18,7 @@ const schemas = {
     name: Joi.string().pattern(new RegExp("^[a-zA-Z]{3,50}$")).required(),
     email: email,
     password: password,
-    repeatPassword: Joi.ref("password"),
+    repeatPassword: Joi.any().valid(Joi.ref("password")),
     timestamp: Joi.string().required(),
   }),
 

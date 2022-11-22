@@ -75,6 +75,18 @@ async function addProduct(store_id, name, description, type_id, image, price) {
   }
 }
 
+async function getProductByStore(store_id) {
+  try {
+    const data = await Menu.findAll({
+      where: {
+        store_id: store_id,
+      },
+    });
+    if (data.length > 0) return data;
+    else return null;
+  } catch (error) {}
+}
+
 async function getProductByName(name) {
   try {
     const data = await Menu.findAll({
@@ -176,4 +188,5 @@ module.exports = {
   getProductByName,
   addProduct,
   getProductDetail,
+  getProductByStore,
 };

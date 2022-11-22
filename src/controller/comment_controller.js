@@ -33,7 +33,7 @@ module.exports = {
         const image = req.body.image;
         const star = req.body.star;
         const timestamp = req.body.timestamp;
-        const createdAt = timestamp;
+        const createdAt = req.body.createdAt;
         // Insert comment into database
         const result = await insertComment(
           store_id,

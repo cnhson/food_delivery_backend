@@ -49,7 +49,14 @@ const Store = sequelize.define(
   }
 );
 
-async function insertStore(owner_id, name, address, description, type_id, timestamp) {
+async function insertStore(
+  owner_id,
+  name,
+  address,
+  description,
+  type_id,
+  timestamp
+) {
   try {
     await Store.create({
       owner_id: owner_id,
@@ -85,4 +92,33 @@ async function checkStoreByName(name) {
   }
 }
 
-module.exports = { Store, insertStore, checkStoreByName };
+async function getStoreById(id) {
+  try {
+    const data = await Store.findAll({
+      attributes: [
+        `id`,
+        `owner_id`,
+        `name`,
+        `address`,
+        `description`,
+        `type_id`,
+        `image`,
+        `active_date`,
+        `timestamp`,
+      ],
+      where: {
+        id: id,
+      },
+    });
+    if (data.length > 0) {
+      return data;
+    } else {
+      return null;
+    }
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+
+module.exports = { Store, insertStore, checkStoreByName, getStoreById };

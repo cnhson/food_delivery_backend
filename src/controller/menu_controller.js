@@ -30,8 +30,6 @@ module.exports = {
       const image = req.body.image;
       const price = req.body.price;
 
-      const product_id = gfl(name);
-
       if (store_id === null || type_id === null || id === null) {
         res.status(200).json({ error: "Check id again" });
         return;

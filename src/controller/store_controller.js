@@ -1,36 +1,57 @@
-const { insertStore , checkStoreByName } = require("../models/store");
-
+const {
+  insertStore,
+  checkStoreByName,
+  getStoreById,
+} = require("../models/store");
+const { getProductByStore } = require("../models/menu");
 module.exports = {
-
-createStore: async function (req, res, next) {
+  createStore: async function (req, res, next) {
     try {
-
       const owner_id = req.body.owner_id;
       const name = req.body.name;
       const address = req.body.address;
       const description = req.body.description;
       const type_id = req.body.type_id;
       const timestamp = req.body.timestamp;
-        
-        // Check store's name
-        if(namecheck!= false){
+
+      // Check store's name
+      if (namecheck != false) {
         // Insert store into database
         const result = await insertStore(
-            owner_id,
-            name,
-            address,
-            description,
-            type_id,
-            timestamp
-          );
+          owner_id,
+          name,
+          address,
+          description,
+          type_id,
+          timestamp
+        );
 
-          if (result) {
-            res.status(200).json({ message: "Create store successfully" });
-          } 
+        if (result) {
+          res.status(200).json({ message: "Create store successfully" });
         }
+      }
     } catch (err) {
       res.status(500).send(err);
     }
   },
 
-}
+  getStore: async function (req, res) {
+    try {
+      const sid = req.params.sid;
+      console.log(sid);
+      if (sid != null) {
+        const getstore = getStoreById(sid);
+        const getproducts = getProductByStore(sid);
+        const [store, products] = await Promise.all([getstore, getproducts]);
+        //console.log([f_store, f_products]);
+        if ([store, products]) {
+          res.status(200).json({ store, products });
+        }
+      } else {
+        res.status(500).json("ID not found");
+      }
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+};

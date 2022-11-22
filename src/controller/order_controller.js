@@ -85,9 +85,10 @@ module.exports = {
       const account_id = req.session.User.id;
       let status = "";
 
-      if (req.params.status != null && req.params.status != undefined) {
+      if (req.params.status != "any") {
         status = req.params.status;
       }
+      console.log("test [" + status + "]");
       const result = await getUserOrderList(account_id, status);
 
       if (result.length != 0) {
