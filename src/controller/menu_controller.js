@@ -53,6 +53,7 @@ module.exports = {
   editProduct: async function (req, res, next) {
     try {
       const id = req.body.id;
+      const store_id = req.body.store_id;
       const name = req.body.name;
       const description = req.body.description;
       const type_id = req.body.type_id;
@@ -63,6 +64,7 @@ module.exports = {
 
       const result = await editProduct(
         id,
+        store_id,
         name,
         description,
         type_id,

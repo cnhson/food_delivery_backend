@@ -146,6 +146,7 @@ async function getAllProduct() {
 
 async function updateProductById(
   id,
+  store_id,
   name,
   description,
   image,
@@ -167,6 +168,7 @@ async function updateProductById(
       {
         where: {
           id: id,
+          store_id: store_id,
         },
       }
     );

@@ -2,13 +2,14 @@ const {
   insertStore,
   checkStoreByName,
   getStoreById,
+  getUserStore,
   updateStoreById,
 } = require("../models/store");
 const { getProductByStore } = require("../models/menu");
 module.exports = {
   createStore: async function (req, res, next) {
     try {
-      const owner_id = req.body.owner_id;
+      const owner_id = req.session.User.id;
       const name = req.body.name;
       const address = req.body.address;
       const description = req.body.description;
@@ -52,9 +53,28 @@ module.exports = {
     }
   },
 
+  loadUserStore: async function (req, res) {
+    try {
+      const owner_id = req.session.User.id;
+
+      const storelist = await getUserStore(owner_id);
+
+      if (storelist) {
+        res.status(200).json({ storelist });
+      } else if (storelist == null) {
+        res.status(500).json("No store created yet");
+      } else {
+        res.status(500).json("User's ID is not belong to seller type");
+      }
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+
   editStore: async function (req, res, next) {
     try {
       const id = req.body.id;
+      const owner_id = req.session.User.id;
       const name = req.body.name;
       const address = req.body.address;
       const description = req.body.description;
@@ -63,6 +83,7 @@ module.exports = {
 
       const result = await updateStoreById(
         id,
+        owner_id,
         name,
         address,
         description,

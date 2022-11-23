@@ -73,17 +73,17 @@ module.exports = {
           res.status(200).json({ error: "Password is incorrect" });
           return;
         }
-        //Get role from above data
-        const role = account[0].role;
-
         //Create session
         req.session.User = {
           id: account[0].id,
           name: account[0].name,
           email: account[0].email,
           password: account[0].password,
-          role: "CUS",
+          role: account[0].role_id,
         };
+
+        //Get role from above data
+        const role = account[0].role_id;
 
         //Redirect to specific url depending on role after succesful login
         if (role === "CUS") {
@@ -93,7 +93,7 @@ module.exports = {
           console.log(req.session);
         } else {
           req.session.save(() => {
-            res.redirect("/menu/products");
+            res.redirect("/store/homepage");
           });
           console.log(req.session);
         }

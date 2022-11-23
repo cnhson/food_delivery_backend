@@ -76,6 +76,7 @@ async function insertStore(
 
 async function updateStoreById(
   id,
+  owner_id,
   name,
   address,
   description,
@@ -94,6 +95,7 @@ async function updateStoreById(
       {
         where: {
           id: id,
+          owner_id: owner_id,
         },
       }
     );
@@ -152,10 +154,40 @@ async function getStoreById(id) {
   }
 }
 
+async function getUserStore(owner_id) {
+  try {
+    const data = await Store.findAll({
+      attributes: [
+        `id`,
+        `owner_id`,
+        `name`,
+        `address`,
+        `description`,
+        `type_id`,
+        `image`,
+        `active_date`,
+        `timestamp`,
+      ],
+      where: {
+        owner_id: owner_id,
+      },
+    });
+    if (data.length > 0) {
+      return data;
+    } else {
+      return null;
+    }
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+
 module.exports = {
   Store,
   insertStore,
   checkStoreByName,
   getStoreById,
   updateStoreById,
+  getUserStore,
 };
