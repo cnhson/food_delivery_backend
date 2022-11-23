@@ -144,6 +144,40 @@ async function getAllProduct() {
   }
 }
 
+async function updateProductById(
+  id,
+  name,
+  description,
+  image,
+  price,
+  out_of_stock,
+  del_flag
+) {
+  try {
+    const data = await Menu.update(
+      {
+        name: name,
+        description: description,
+        type_id: type_id,
+        image: image,
+        price: price,
+        out_of_stock: out_of_stock,
+        del_flag: del_flag,
+      },
+      {
+        where: {
+          id: id,
+        },
+      }
+    );
+    if (data.length > 0) return data;
+    else return null;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
+
 async function getProductDetail(id) {
   try {
     //Filter product info
@@ -189,4 +223,5 @@ module.exports = {
   addProduct,
   getProductDetail,
   getProductByStore,
+  updateProductById,
 };

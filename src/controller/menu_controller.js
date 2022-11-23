@@ -3,16 +3,10 @@ const {
   getProductByName,
   addProduct,
   getProductDetail,
+  updateProductById,
 } = require("../models/menu");
 
 const { getCommentsListFromStore } = require("../models/comment");
-
-// store_id= store_id
-// name= name
-// description= description
-// type_id= type_id
-// image= image
-// price= price
 
 module.exports = {
   test: async function (req, res) {
@@ -49,6 +43,40 @@ module.exports = {
           res.status(200).json("Fail to add product");
           return;
         }
+      }
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+  },
+
+  editProduct: async function (req, res, next) {
+    try {
+      const id = req.body.id;
+      const name = req.body.name;
+      const description = req.body.description;
+      const type_id = req.body.type_id;
+      const image = req.body.image;
+      const price = req.body.price;
+      const out_of_stock = req.body.out_of_stock;
+      const del_flag = req.body.del_flag;
+
+      const result = await editProduct(
+        id,
+        name,
+        description,
+        type_id,
+        image,
+        price,
+        out_of_stock,
+        del_flag
+      );
+      if (result) {
+        res.status(200).json("Edit product successfully");
+        return;
+      } else {
+        res.status(200).json("Fail to edit product");
+        return;
       }
     } catch (err) {
       console.log(err);

@@ -97,18 +97,22 @@ async function updateComment(
   updatedAt
 ) {
   try {
-    await Comment.update({
-      comment: comment,
-      image: image,
-      star: star,
-      timestamp: timestamp,
-      updatedAt: updatedAt,
-      where: {
-        store_id: store_id,
-        order_id: order_id,
-        account_id: account_id,
+    await Comment.update(
+      {
+        comment: comment,
+        image: image,
+        star: star,
+        timestamp: timestamp,
+        updatedAt: updatedAt,
       },
-    });
+      {
+        where: {
+          store_id: store_id,
+          order_id: order_id,
+          account_id: account_id,
+        },
+      }
+    );
     return true;
   } catch (err) {
     console.log(err);

@@ -74,6 +74,37 @@ async function insertStore(
   }
 }
 
+async function updateStoreById(
+  id,
+  name,
+  address,
+  description,
+  type_id,
+  timestamp
+) {
+  try {
+    const data = await Store.update(
+      {
+        name,
+        address,
+        description,
+        type_id,
+        timestamp,
+      },
+      {
+        where: {
+          id: id,
+        },
+      }
+    );
+    if (data.length > 0) return data;
+    else return null;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
+
 async function checkStoreByName(name) {
   try {
     const data = await Store.findAll({
@@ -121,4 +152,10 @@ async function getStoreById(id) {
   }
 }
 
-module.exports = { Store, insertStore, checkStoreByName, getStoreById };
+module.exports = {
+  Store,
+  insertStore,
+  checkStoreByName,
+  getStoreById,
+  updateStoreById,
+};

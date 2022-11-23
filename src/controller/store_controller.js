@@ -2,6 +2,7 @@ const {
   insertStore,
   checkStoreByName,
   getStoreById,
+  updateStoreById,
 } = require("../models/store");
 const { getProductByStore } = require("../models/menu");
 module.exports = {
@@ -14,21 +15,17 @@ module.exports = {
       const type_id = req.body.type_id;
       const timestamp = req.body.timestamp;
 
-      // Check store's name
-      if (namecheck != false) {
-        // Insert store into database
-        const result = await insertStore(
-          owner_id,
-          name,
-          address,
-          description,
-          type_id,
-          timestamp
-        );
+      const result = await insertStore(
+        owner_id,
+        name,
+        address,
+        description,
+        type_id,
+        timestamp
+      );
 
-        if (result) {
-          res.status(200).json({ message: "Create store successfully" });
-        }
+      if (result) {
+        res.status(200).json({ message: "Create store successfully" });
       }
     } catch (err) {
       res.status(500).send(err);
@@ -49,6 +46,32 @@ module.exports = {
         }
       } else {
         res.status(500).json("ID not found");
+      }
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+
+  editStore: async function (req, res, next) {
+    try {
+      const id = req.body.id;
+      const name = req.body.name;
+      const address = req.body.address;
+      const description = req.body.description;
+      const type_id = req.body.type_id;
+      const timestamp = req.body.timestamp;
+
+      const result = await updateStoreById(
+        id,
+        name,
+        address,
+        description,
+        type_id,
+        timestamp
+      );
+
+      if (result) {
+        res.status(200).json({ message: "Edit store successfully" });
       }
     } catch (err) {
       res.status(500).send(err);
