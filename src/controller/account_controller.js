@@ -3,10 +3,12 @@ const bcrypt = require("bcryptjs");
 const session = require("express-session");
 
 module.exports = {
-  test: async function (req, res) {
-    const bemail = req.session.User.email;
-    const bpassword = req.session.User.password;
-    res.send({ bemail, bpassword });
+  logoutAccount: async function (req, res) {
+    try {
+      await req.session.destroy();
+      res.redirect("/homepage");
+      console.log(req.session);
+    } catch (error) {}
   },
 
   registerAccount: async function (req, res) {

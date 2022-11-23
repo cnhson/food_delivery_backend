@@ -5,6 +5,7 @@ const schemas = require("../middleware/schema");
 const { PROPERTY_TYPE } = require("../services/constant");
 
 router.post("/login", account.loginAccount);
+router.post("/logout", account.logoutAccount);
 //router.post("/test", account.test);
 
 router

@@ -8,6 +8,9 @@ const order_route = require("./order_route");
 const comment_route = require("./comment_route");
 
 router.get("/init", app.Init);
+router.get("/homepage", function (req, res, next) {
+  res.status(200).json({ message: "Hello, this is homepage" });
+});
 router.use("/account", account_route);
 router.use("/menu", menu_route);
 router.use("/store", store_route);
