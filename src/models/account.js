@@ -77,5 +77,21 @@ async function getAccountByEmail(email) {
     return null;
   }
 }
-
-module.exports = { Account, insertAccount, getAccountByEmail};
+async function getAccountById(id) {
+  try {
+    const data = await Account.findAll({
+      where: {
+        id: id,
+      },
+    });
+    if (data.length > 0) {
+      return data[0];
+    } else {
+      return null;
+    }
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+module.exports = { Account, insertAccount, getAccountByEmail, getAccountById};

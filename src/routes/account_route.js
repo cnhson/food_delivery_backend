@@ -22,4 +22,11 @@ router
     account.registerAccount
   );
 
+router
+  .route("/login")
+  .post(
+    middleware(schemas.loginAccount, PROPERTY_TYPE.body),
+    account.loginAccount
+  );
+
 module.exports = router;
