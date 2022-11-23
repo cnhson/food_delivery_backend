@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const routes = require("./routes");
+const session = require('express-session');
 // const cron = require("./cron-job");
 
 require("dotenv").config();
@@ -17,6 +18,12 @@ require("./models");
 app.use(cors());
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
+
+app.use(session({
+  resave: true, 
+  saveUninitialized: true, 
+  secret: 'test', 
+  cookie: { maxAge: 60000 }}));
 
 /* CROS middleware */
 app.use(function (req, res, next) {

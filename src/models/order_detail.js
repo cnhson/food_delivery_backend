@@ -9,7 +9,7 @@ const orderDetail = sequelize.define(
       autoIncrement: true,
       primaryKey: true,
     },
-    ordder_id: {
+    order_id: {
       type: DataTypes.STRING(25),
       allowNull: false,
       references: {
@@ -18,7 +18,7 @@ const orderDetail = sequelize.define(
       },
     },
     product_id: {
-      type: DataTypes.STRING(25),
+      type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
       references: {
@@ -36,4 +36,19 @@ const orderDetail = sequelize.define(
   }
 );
 
-module.exports = { orderDetail };
+async function insertOrderDetail(order_id, product_id, quantity) {
+  try {
+    await orderDetail.create({
+      order_id: order_id,
+      product_id: product_id,
+      quantity: quantity,
+    });
+
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+module.exports = { orderDetail, insertOrderDetail };

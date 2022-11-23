@@ -1,10 +1,19 @@
 const { insertAccount, getAccountByEmail } = require("../models/account");
 const bcrypt = require("bcryptjs");
+const session = require("express-session");
 
 module.exports = {
+  logoutAccount: async function (req, res) {
+    try {
+      await req.session.destroy();
+      res.redirect("/homepage");
+      console.log(req.session);
+    } catch (error) {}
+  },
+
   registerAccount: async function (req, res) {
     try {
-      const role_id = req.body.role_id;
+      const role_id = req.body.role;
       const name = req.body.name;
       const email = req.body.email;
       const password = req.body.password;
@@ -39,7 +48,7 @@ module.exports = {
         });
       });
     } catch (err) {
-      res.status(500).send(err);
+      res.status(500).send("Error");
     }
   },
 
@@ -54,8 +63,8 @@ module.exports = {
         res.status(200).json({ error: "This account does not exists" });
         return;
       }
-      account = account.dataValues;
-      const hashedPassword = account.password;
+      //console.log(account[0].password);
+      const hashedPassword = account[0].password;
       bcrypt.compare(password, hashedPassword, function (err, isMatch) {
         if (err) {
           res.status(200).json({ error: err });
@@ -66,10 +75,30 @@ module.exports = {
           res.status(200).json({ error: "Password is incorrect" });
           return;
         }
+        //Create session
+        req.session.User = {
+          id: account[0].id,
+          name: account[0].name,
+          email: account[0].email,
+          password: account[0].password,
+          role: account[0].role_id,
+        };
 
-        res.status(200).json({ message: "Login successfully" });
-        console.log("successfully");
-        return;
+        //Get role from above data
+        const role = account[0].role_id;
+
+        //Redirect to specific url depending on role after succesful login
+        if (role === "CUS") {
+          req.session.save(() => {
+            res.redirect("/menu/products");
+          });
+          console.log(req.session);
+        } else {
+          req.session.save(() => {
+            res.redirect("/store/homepage");
+          });
+          console.log(req.session);
+        }
       });
     } catch (err) {
       console.log(err);

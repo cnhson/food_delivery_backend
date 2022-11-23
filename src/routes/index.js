@@ -2,12 +2,19 @@ const express = require("express");
 const router = express.Router();
 const app = require("../controller");
 const account_route = require("./account_route");
+const menu_route = require("./menu_route");
+const store_route = require("./store_route");
+const order_route = require("./order_route");
+const comment_route = require("./comment_route");
 
 router.get("/init", app.Init);
+router.get("/homepage", function (req, res, next) {
+  res.status(200).json({ message: "Hello, this is homepage" });
+});
 router.use("/account", account_route);
-
-// router.get("*", (req, res) => {
-//   res.json("Welcome to food delivery app");
-// });
+router.use("/menu", menu_route);
+router.use("/store", store_route);
+router.use("/order", order_route);
+router.use("/feedback", comment_route);
 
 module.exports = router;

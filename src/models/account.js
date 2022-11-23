@@ -53,7 +53,6 @@ async function insertAccount(role_id, name, email, password, timestamp) {
       del_fag: false,
       timestamp,
     });
-
     return true;
   } catch (err) {
     console.log(err);
@@ -69,7 +68,7 @@ async function getAccountByEmail(email) {
       },
     });
     if (data.length > 0) {
-      return data[0];
+      return data;
     } else {
       return null;
     }
@@ -79,4 +78,4 @@ async function getAccountByEmail(email) {
   }
 }
 
-module.exports = { Account, insertAccount, getAccountByEmail };
+module.exports = { Account, insertAccount, getAccountByEmail};

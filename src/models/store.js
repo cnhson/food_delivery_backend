@@ -16,6 +16,9 @@ const Store = sequelize.define(
         key: "id",
       },
     },
+    name: {
+      type: DataTypes.STRING(255),
+    },
     address: {
       type: DataTypes.STRING(255),
       allowNull: false,
@@ -46,4 +49,145 @@ const Store = sequelize.define(
   }
 );
 
-module.exports = { Store };
+async function insertStore(
+  owner_id,
+  name,
+  address,
+  description,
+  type_id,
+  timestamp
+) {
+  try {
+    await Store.create({
+      owner_id: owner_id,
+      name: name,
+      address: address,
+      description: description,
+      type_id: type_id,
+      timestamp,
+    });
+
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+async function updateStoreById(
+  id,
+  owner_id,
+  name,
+  address,
+  description,
+  type_id,
+  timestamp
+) {
+  try {
+    const data = await Store.update(
+      {
+        name,
+        address,
+        description,
+        type_id,
+        timestamp,
+      },
+      {
+        where: {
+          id: id,
+          owner_id: owner_id,
+        },
+      }
+    );
+    if (data.length > 0) return data;
+    else return null;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
+
+async function checkStoreByName(name) {
+  try {
+    const data = await Store.findAll({
+      where: {
+        name: name,
+      },
+    });
+    if (data.length > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+
+async function getStoreById(id) {
+  try {
+    const data = await Store.findAll({
+      attributes: [
+        `id`,
+        `owner_id`,
+        `name`,
+        `address`,
+        `description`,
+        `type_id`,
+        `image`,
+        `active_date`,
+        `timestamp`,
+      ],
+      where: {
+        id: id,
+      },
+    });
+    if (data.length > 0) {
+      return data;
+    } else {
+      return null;
+    }
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+
+async function getUserStore(owner_id) {
+  try {
+    const data = await Store.findAll({
+      attributes: [
+        `id`,
+        `owner_id`,
+        `name`,
+        `address`,
+        `description`,
+        `type_id`,
+        `image`,
+        `active_date`,
+        `timestamp`,
+      ],
+      where: {
+        owner_id: owner_id,
+      },
+    });
+    if (data.length > 0) {
+      return data;
+    } else {
+      return null;
+    }
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+
+module.exports = {
+  Store,
+  insertStore,
+  checkStoreByName,
+  getStoreById,
+  updateStoreById,
+  getUserStore,
+};
