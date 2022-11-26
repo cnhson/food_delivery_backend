@@ -1,12 +1,46 @@
 const {
   insertStore,
-  checkStoreByName,
   getStoreById,
   getUserStore,
   updateStoreById,
 } = require("../models/store");
+
+const { pendingOrder, checkNewOrders } = require("../models/order");
 const { getProductByStore } = require("../models/menu");
 module.exports = {
+  pending: async function (req, res) {
+    try {
+      const order_id = req.body.order_id;
+      const account_id = req.body.account_id;
+
+      const pending_res = await pendingOrder(order_id, account_id);
+
+      if (pending_res) {
+        res.status(200).json({ message: "Changed to pending!!" });
+      }
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+
+  getNewOrders: async function (req, res) {
+    try {
+      const store_id = req.body.store_id;
+
+      if (store_id != null) {
+        const neworders = await checkNewOrders(store_id);
+
+        if (neworders) {
+          res.status(200).json({ neworders });
+        }
+      } else {
+        res.status(500).json("Store ID not found");
+      }
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+
   createStore: async function (req, res, next) {
     try {
       const owner_id = req.session.User.id;

@@ -53,7 +53,9 @@ const Comment = sequelize.define(
     },
   },
   {
-    timestamp: false,
+    timestamps: false,
+    createdAt: false,
+    updatedAt: false,
   }
 );
 
@@ -77,7 +79,7 @@ async function insertComment(
       star: star,
       timestamp: timestamp,
       createdAt: createdAt,
-      updatedAt: "0",
+      updatedAt: "",
     });
     return true;
   } catch (err) {

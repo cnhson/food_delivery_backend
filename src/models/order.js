@@ -25,19 +25,6 @@ const Order = sequelize.define(
       type: DataTypes.STRING(50),
       allowNull: false,
     },
-    // product_id: {
-    //   type: DataTypes.STRING(25),
-    //   allowNull: false,
-    //   primaryKey: true,
-    //   references: {
-    //     model: "menu",
-    //     type: "id",
-    //   },
-    // },
-    // quantity: {
-    //   type: DataTypes.STRING,
-    //   allowNull: false,
-    // },
     timestamp: {
       type: DataTypes.STRING(25),
       allowNull: false,
@@ -88,14 +75,16 @@ async function insertOrder(
 
 async function getExistUserOrder(account_id, product_id) {
   try {
-    const data = await Order.findOne({
-      include: { model: orderDetail },
-      where: {
-        account_id: account_id,
-        product_id: product_id,
-      },
-    });
-
+    const data = await sequelize.query(
+      "SELECT * FROM food_delivery.order o inner join order_detail od on o.id = od.order_id where account_id = " +
+        account_id +
+        " and product_id = " +
+        product_id +
+        " ORDER BY o.id DESC LIMIT 1",
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
     return data;
   } catch (err) {
     console.log(err);
@@ -114,6 +103,70 @@ async function getUserOrderList(account_id, status) {
         account_id: account_id,
         status: {
           [Op.like]: "%" + status + "%",
+        },
+      },
+    });
+    return data;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+
+async function pendingOrder(id, account_id) {
+  try {
+    await Order.update({
+      status: "pending",
+      where: {
+        id: id,
+        account_id: account_id,
+      },
+    });
+
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+async function receiveOrder(id, account_id) {
+  try {
+    await Order.update({
+      status: "done",
+      where: {
+        id: id,
+        account_id: account_id,
+      },
+    });
+
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+async function checkNewOrders(store_id) {
+  try {
+    const data = await Order.findAll({
+      attributes: [
+        "id",
+        "account_id",
+        "price",
+        "ship_fee",
+        "timestamp",
+        "payment_method",
+        "status",
+      ],
+      include: {
+        model: orderDetail,
+        attributes: ["product_id", "quantity"],
+      },
+      where: {
+        status: "received",
+        id: {
+          [Op.like]: "%" + store_id + "%",
         },
       },
     });
@@ -151,4 +204,7 @@ module.exports = {
   getExistUserOrder,
   getUserOrderList,
   calculateTotal,
+  checkNewOrders,
+  pendingOrder,
+  receiveOrder,
 };

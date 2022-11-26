@@ -2,6 +2,7 @@ const {
   insertOrder,
   getUserOrderList,
   calculateTotal,
+  receiveOrder,
 } = require("../models/order");
 const { insertOrderDetail } = require("../models/order_detail");
 const crypto = require("crypto");
@@ -14,6 +15,18 @@ const crypto = require("crypto");
 // timestamp,
 
 module.exports = {
+  receive: async function (req, res) {
+    try {
+      const order_id = req.body.order_id;
+      const account_id = req.session.User.id;
+
+      const receive_res = await receiveOrder(order_id, account_id);
+      if (receive_res) res.status(200).json({ message: "Order received!!" });
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+
   calculate: async function (req, res) {
     try {
       const store_id = req.body.store_id;
