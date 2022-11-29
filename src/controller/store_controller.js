@@ -1,9 +1,4 @@
-const {
-  insertStore,
-  getStoreById,
-  getUserStore,
-  updateStoreById,
-} = require("../models/store");
+const { insertStore, getStoreById, getUserStore, updateStoreById } = require("../models/store");
 
 const { pendingOrder, checkNewOrders } = require("../models/order");
 const { getProductByStore } = require("../models/menu");
@@ -43,6 +38,7 @@ module.exports = {
 
   createStore: async function (req, res, next) {
     try {
+      const id = crypto.randomBytes(3).toString("hex");
       const owner_id = req.session.User.id;
       const name = req.body.name;
       const address = req.body.address;
@@ -50,14 +46,7 @@ module.exports = {
       const type_id = req.body.type_id;
       const timestamp = req.body.timestamp;
 
-      const result = await insertStore(
-        owner_id,
-        name,
-        address,
-        description,
-        type_id,
-        timestamp
-      );
+      const result = await insertStore(id, owner_id, name, address, description, type_id, timestamp);
 
       if (result) {
         res.status(200).json({ message: "Create store successfully" });
@@ -90,15 +79,18 @@ module.exports = {
   loadUserStore: async function (req, res) {
     try {
       const owner_id = req.session.User.id;
+      if (owner_id != null) {
+        const storelist = await getUserStore(owner_id);
 
-      const storelist = await getUserStore(owner_id);
-
-      if (storelist) {
-        res.status(200).json({ storelist });
-      } else if (storelist == null) {
-        res.status(500).json("No store created yet");
+        if (storelist) {
+          res.status(200).json({ storelist });
+        } else if (storelist == null) {
+          res.status(500).json("No store created yet");
+        } else {
+          res.status(500).json("User's ID is not belong to seller type");
+        }
       } else {
-        res.status(500).json("User's ID is not belong to seller type");
+        res.status(500).json("Please login!");
       }
     } catch (err) {
       res.status(500).send(err);
@@ -115,15 +107,7 @@ module.exports = {
       const type_id = req.body.type_id;
       const timestamp = req.body.timestamp;
 
-      const result = await updateStoreById(
-        id,
-        owner_id,
-        name,
-        address,
-        description,
-        type_id,
-        timestamp
-      );
+      const result = await updateStoreById(id, owner_id, name, address, description, type_id, timestamp);
 
       if (result) {
         res.status(200).json({ message: "Edit store successfully" });

@@ -54,21 +54,12 @@ const Comment = sequelize.define(
   },
   {
     timestamps: false,
-    createdAt: false,
-    updatedAt: false,
+    // createdAt: false,
+    // updatedAt: false,
   }
 );
 
-async function insertComment(
-  store_id,
-  order_id,
-  account_id,
-  comment,
-  image,
-  star,
-  timestamp,
-  createdAt
-) {
+async function insertComment(store_id, order_id, account_id, comment, image, star, timestamp) {
   try {
     await Comment.create({
       store_id: store_id,
@@ -78,8 +69,6 @@ async function insertComment(
       image: image,
       star: star,
       timestamp: timestamp,
-      createdAt: createdAt,
-      updatedAt: "",
     });
     return true;
   } catch (err) {
@@ -88,16 +77,7 @@ async function insertComment(
   }
 }
 
-async function updateComment(
-  store_id,
-  order_id,
-  account_id,
-  comment,
-  image,
-  star,
-  timestamp,
-  updatedAt
-) {
+async function updateComment(store_id, order_id, account_id, comment, image, star, timestamp) {
   try {
     await Comment.update(
       {
@@ -105,7 +85,6 @@ async function updateComment(
         image: image,
         star: star,
         timestamp: timestamp,
-        updatedAt: updatedAt,
       },
       {
         where: {

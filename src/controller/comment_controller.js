@@ -14,9 +14,7 @@ module.exports = {
         res.status(200).json({ message: "Please order first!!" });
         return;
       } else if (check[0].status != "done") {
-        res
-          .status(200)
-          .json({ message: "You haven't received the order yet!!" });
+        res.status(200).json({ message: "You haven't received the order yet!!" });
         return;
       } else {
         const order_id = check[0].order_id;
@@ -24,24 +22,12 @@ module.exports = {
         const image = req.body.image;
         const star = req.body.star;
         const timestamp = req.body.timestamp;
-        const createdAt = req.body.createdAt;
 
         // Insert comment into database
-        const result = await insertComment(
-          store_id,
-          order_id,
-          account_id,
-          comment,
-          image,
-          star,
-          timestamp,
-          createdAt
-        );
+        const result = await insertComment(store_id, order_id, account_id, comment, image, star, timestamp);
 
         if (result) {
-          res
-            .status(200)
-            .json({ message: "Comment added, thanks you again!!" });
+          res.status(200).json({ message: "Comment added, thanks you again!!" });
         }
       }
     } catch (err) {
@@ -58,18 +44,8 @@ module.exports = {
       const image = req.body.image;
       const star = req.body.star;
       const timestamp = req.body.timestamp;
-      const updatedAt = req.body.updatedAt;
       // Insert comment into database
-      const result = await updateComment(
-        store_id,
-        order_id,
-        account_id,
-        comment,
-        image,
-        star,
-        timestamp,
-        updatedAt
-      );
+      const result = await updateComment(store_id, order_id, account_id, comment, image, star, timestamp);
 
       if (result) {
         res.status(200).json({ message: "Comment editted!!" });
