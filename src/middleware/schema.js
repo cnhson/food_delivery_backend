@@ -117,6 +117,7 @@ const schemas = {
   }),
 
   editStore: Joi.object().keys({
+    id: id,
     owner_id: owner_id,
     name: name,
     address: address,
