@@ -94,4 +94,4 @@ async function getAccountById(id) {
     return null;
   }
 }
-module.exports = { Account, insertAccount, getAccountByEmail, getAccountById};
+module.exports = { Account, insertAccount, getAccountByEmail, getAccountById };

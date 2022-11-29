@@ -27,21 +27,18 @@ const schemas = {
     email: email,
     password: password,
   }),
-  
 
-  // Schema for comment 
+  // Schema for comment
   Comment: Joi.object().keys({
-    id:this.id,
-    store_id:Joi.string().pattern(new RegExp("^[a-zA-Z]{1,25}$")).required(),
-    order_id:Joi.string().pattern(new RegExp("^[a-zA-Z]{1,25}$")).required(),
-    account_id:Joi.number().required(),
+    id: Joi.number().min(0).required(),
+    store_id: Joi.string().pattern(new RegExp("^[a-zA-Z]{1,25}$")).required(),
+    order_id: Joi.string().pattern(new RegExp("^[a-zA-Z]{1,25}$")).required(),
+    account_id: Joi.number().required(),
     comment: Joi.string().pattern(new RegExp("^[a-zA-Z]{3,2000}$")).required(),
-    image:Joi.string().required(),
+    image: Joi.string().required(),
     star: Joi.number().required(),
-    timestamp:Joi.string().required(),
+    timestamp: Joi.string().required(),
   }),
-  
 };
 
-
-module.exports = schemas;
+module.exports = { schemas };
