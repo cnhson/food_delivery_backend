@@ -23,22 +23,24 @@ const schemas = {
   }),
 
   // Schema for login
-  loginAccount: Joi.object().keys({}),
-  name: Joi.string().pattern(new RegExp("^[a-zA-Z]{3,50}$")).required(),
-  password: password,
+  loginAccount: Joi.object().keys({
+    email: email,
+    password: password,
+  }),
+  
 
   // Schema for comment 
-  Comment: Joi.object().keys({}),
+  Comment: Joi.object().keys({
     id:this.id,
     store_id:Joi.string().pattern(new RegExp("^[a-zA-Z]{1,25}$")).required(),
     order_id:Joi.string().pattern(new RegExp("^[a-zA-Z]{1,25}$")).required(),
-    account_id:Joi.int().required(),
+    account_id:Joi.number().required(),
     comment: Joi.string().pattern(new RegExp("^[a-zA-Z]{3,2000}$")).required(),
-    image:Joi.blod().required(),
-    star: Joi.int().required(),
+    image:Joi.string().required(),
+    star: Joi.number().required(),
     timestamp:Joi.string().required(),
-    createdAt:Joi.string().required(),
-    updatedAt:Joi.string().required(),
+  }),
+  
 };
 
 
