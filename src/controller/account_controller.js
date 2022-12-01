@@ -1,4 +1,4 @@
-const { insertAccount, getAccountByEmail } = require("../models/account");
+const { insertAccount, getAccountByEmailAndRole } = require("../models/account");
 const bcrypt = require("bcryptjs");
 const session = require("express-session");
 
@@ -6,9 +6,10 @@ module.exports = {
   logoutAccount: async function (req, res) {
     try {
       await req.session.destroy();
-      res.redirect("/homepage");
-      console.log(req.session);
-    } catch (error) {}
+      res.status(200).json("Logout successfully!");
+    } catch (error) {
+      res.status(500).json("Logout Failed!");
+    }
   },
 
   registerAccount: async function (req, res) {
@@ -24,21 +25,13 @@ module.exports = {
       bcrypt.genSalt(10, function (err, Salt) {
         bcrypt.hash(password, Salt, async function (err, hash) {
           if (err) {
-            res
-              .status(200)
-              .json({ message: "there is an error while register account" });
+            res.status(200).json({ message: "there is an error while register account" });
             return console.log("Cannot encrypt");
           }
 
           hashedPassword = hash;
           // Insert account into database
-          const result = await insertAccount(
-            role_id,
-            name,
-            email,
-            hashedPassword,
-            timestamp
-          );
+          const result = await insertAccount(role_id, name, email, hashedPassword, timestamp);
 
           if (result) {
             res.status(200).json({ message: "Register successfully" });
@@ -56,15 +49,17 @@ module.exports = {
     try {
       const email = req.body.email;
       const password = req.body.password;
+      const role_id = req.body.role_id;
 
       // Check if given account is exists
-      let account = await getAccountByEmail(email);
+      let account = await getAccountByEmailAndRole(email, role_id);
       if (account === null) {
-        res.status(200).json({ error: "This account does not exists" });
+        res.status(500).json({ error: "This account does not exists" });
         return;
       }
+      account = account[0];
       //console.log(account[0].password);
-      const hashedPassword = account[0].password;
+      const hashedPassword = account.password;
       bcrypt.compare(password, hashedPassword, function (err, isMatch) {
         if (err) {
           res.status(200).json({ error: err });
@@ -77,28 +72,11 @@ module.exports = {
         }
         //Create session
         req.session.User = {
-          id: account[0].id,
-          name: account[0].name,
-          email: account[0].email,
-          password: account[0].password,
-          role: account[0].role_id,
+          id: account.id,
+          name: account.name,
+          email: account.email,
+          role: account.role_id,
         };
-
-        //Get role from above data
-        const role = account[0].role_id;
-
-        //Redirect to specific url depending on role after succesful login
-        if (role === "CUS") {
-          req.session.save(() => {
-            res.redirect("/menu/products");
-          });
-          console.log(req.session);
-        } else {
-          req.session.save(() => {
-            res.redirect("/store/homepage");
-          });
-          console.log(req.session);
-        }
       });
     } catch (err) {
       console.log(err);

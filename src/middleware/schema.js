@@ -8,6 +8,7 @@ const email = Joi.string()
   .required();
 
 const name = Joi.string().pattern(new RegExp("^[a-zA-Z]{3,250}$")).required();
+const role_id = Joi.string().valid("CUS", "SEL").required();
 const owner_id = Joi.number().min(0).required();
 const address = Joi.string().pattern(new RegExp("^[a-zA-Z]{3,250}$")).required();
 const password = Joi.string().pattern(new RegExp("^[a-zA-Z0-9!@#$%^&*()+-/]{8,100}$")).required();
@@ -33,7 +34,7 @@ const date2 = Joi.date().raw();
 ////  Schemas zone //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const schemas = {
   registerAccount: Joi.object().keys({
-    role_id: Joi.string().valid("CUS", "SEL").required(),
+    role_id: role_id,
     name: name,
     email: email,
     password: password,
@@ -42,6 +43,7 @@ const schemas = {
   }),
 
   loginAccount: Joi.object().keys({
+    role_id: role_id,
     email: email,
     password: password,
   }),
