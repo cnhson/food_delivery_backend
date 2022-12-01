@@ -42,21 +42,21 @@ const Comment = sequelize.define(
     star: {
       type: DataTypes.INTEGER,
     },
-    createdAt: {
+    timestamp: {
       type: DataTypes.STRING(25),
     },
-    updatedAt: {
+    updated: {
       type: DataTypes.STRING(25),
     },
   },
   {
     timestamps: false,
-    // createdAt: false,
+    // created: false,
     // updatedAt: false,
   }
 );
 
-async function insertComment(store_id, order_id, account_id, comment, image, star, createAt, updateAt) {
+async function insertComment(store_id, order_id, account_id, comment, image, star, timestamp, updated) {
   try {
     await Comment.create({
       store_id: store_id,
@@ -65,8 +65,8 @@ async function insertComment(store_id, order_id, account_id, comment, image, sta
       comment: comment,
       image: image,
       star: star,
-      createAt: createAt,
-      updateAt: updateAt,
+      timestamp: timestamp,
+      updated: updated,
     });
     return true;
   } catch (err) {
@@ -75,14 +75,14 @@ async function insertComment(store_id, order_id, account_id, comment, image, sta
   }
 }
 
-async function updateComment(comment_id, comment, image, star, updateAt) {
+async function updateComment(comment_id, comment, image, star, updated) {
   try {
     await Comment.update(
       {
         comment: comment,
         image: image,
         star: star,
-        updateAt: updateAt,
+        updated: updated,
       },
       {
         where: {
