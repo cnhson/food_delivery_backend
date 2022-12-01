@@ -9,6 +9,14 @@ const Order = sequelize.define(
       type: DataTypes.STRING(25),
       primaryKey: true,
     },
+    store_id: {
+      type: DataTypes.STRING(25),
+      allowNull: false,
+      references: {
+        model: "store",
+        key: "id",
+      },
+    },
     account_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -47,14 +55,7 @@ const Order = sequelize.define(
   }
 );
 
-async function insertOrder(
-  id,
-  account_id,
-  price,
-  ship_fee,
-  payment_method,
-  timestamp
-) {
+async function insertOrder(id, account_id, price, ship_fee, payment_method, timestamp) {
   try {
     await Order.create({
       id: id,
@@ -73,23 +74,23 @@ async function insertOrder(
   }
 }
 
-async function getExistUserOrder(account_id, product_id) {
-  try {
-    const data = await sequelize.query(
-      "SELECT * FROM food_delivery.order o inner join order_detail od on o.id = od.order_id where account_id = " +
-        account_id +
-        " and product_id = " +
-        product_id +
-        " ORDER BY o.id DESC LIMIT 1",
-      {
-        type: QueryTypes.SELECT,
-      }
-    );
-    return data;
-  } catch (err) {
-    console.log(err);
-    return null;
-  }
+async function getOrderByAccount(account_id, order_id) {
+  return await Comment.findAll({
+    where: {
+      [Op.and]: [
+        {
+          account_id: {
+            [Op.eq]: account_id,
+          },
+        },
+        {
+          id: {
+            [Op.eq]: order_id,
+          },
+        },
+      ],
+    },
+  });
 }
 
 async function getUserOrderList(account_id, status) {
@@ -150,15 +151,7 @@ async function receiveOrder(id, account_id) {
 async function checkNewOrders(store_id) {
   try {
     const data = await Order.findAll({
-      attributes: [
-        "id",
-        "account_id",
-        "price",
-        "ship_fee",
-        "timestamp",
-        "payment_method",
-        "status",
-      ],
+      attributes: ["id", "account_id", "price", "ship_fee", "timestamp", "payment_method", "status"],
       include: {
         model: orderDetail,
         attributes: ["product_id", "quantity"],
@@ -201,7 +194,7 @@ async function calculateTotal(store_id, mil1, mil2) {
 module.exports = {
   Order,
   insertOrder,
-  getExistUserOrder,
+  getOrderByAccount,
   getUserOrderList,
   calculateTotal,
   checkNewOrders,

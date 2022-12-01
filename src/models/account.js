@@ -1,5 +1,5 @@
 const { sequelize } = require("../services/common");
-const { DataTypes } = require("sequelize");
+const { DataTypes, Op } = require("sequelize");
 
 const Account = sequelize.define(
   "account",
@@ -60,11 +60,22 @@ async function insertAccount(role_id, name, email, password, timestamp) {
   }
 }
 
-async function getAccountByEmail(email) {
+async function getAccountByEmailAndRole(email, role_id) {
   try {
     const data = await Account.findAll({
       where: {
-        email: email,
+        [Op.or]: [
+          {
+            email: {
+              [Op.eq]: email,
+            },
+          },
+          {
+            role_id: {
+              [Op.eq]: role_id,
+            },
+          },
+        ],
       },
     });
     if (data.length > 0) {
@@ -78,4 +89,4 @@ async function getAccountByEmail(email) {
   }
 }
 
-module.exports = { Account, insertAccount, getAccountByEmail};
+module.exports = { Account, insertAccount, getAccountByEmailAndRole };

@@ -1,5 +1,5 @@
 const { sequelize } = require("../services/common");
-const { DataTypes } = require("sequelize");
+const { DataTypes, Op } = require("sequelize");
 
 const Comment = sequelize.define(
   "comment",
@@ -42,9 +42,6 @@ const Comment = sequelize.define(
     star: {
       type: DataTypes.INTEGER,
     },
-    timestamp: {
-      type: DataTypes.STRING(25),
-    },
     createdAt: {
       type: DataTypes.STRING(25),
     },
@@ -59,7 +56,7 @@ const Comment = sequelize.define(
   }
 );
 
-async function insertComment(store_id, order_id, account_id, comment, image, star, timestamp) {
+async function insertComment(store_id, order_id, account_id, comment, image, star, createAt, updateAt) {
   try {
     await Comment.create({
       store_id: store_id,
@@ -68,7 +65,8 @@ async function insertComment(store_id, order_id, account_id, comment, image, sta
       comment: comment,
       image: image,
       star: star,
-      timestamp: timestamp,
+      createAt: createAt,
+      updateAt: updateAt,
     });
     return true;
   } catch (err) {
@@ -77,20 +75,20 @@ async function insertComment(store_id, order_id, account_id, comment, image, sta
   }
 }
 
-async function updateComment(store_id, order_id, account_id, comment, image, star, timestamp) {
+async function updateComment(comment_id, comment, image, star, updateAt) {
   try {
     await Comment.update(
       {
         comment: comment,
         image: image,
         star: star,
-        timestamp: timestamp,
+        updateAt: updateAt,
       },
       {
         where: {
-          store_id: store_id,
-          order_id: order_id,
-          account_id: account_id,
+          id: {
+            [Op.eq]: comment_id,
+          },
         },
       }
     );
@@ -115,9 +113,29 @@ async function getCommentsListFromStore(store_id) {
   }
 }
 
+async function getCommetByIdAndAccount(account_id, comment_id) {
+  return await Comment.findAll({
+    where: {
+      [Op.and]: [
+        {
+          account_id: {
+            [Op.eq]: account_id,
+          },
+        },
+        {
+          id: {
+            [Op.eq]: comment_id,
+          },
+        },
+      ],
+    },
+  });
+}
+
 module.exports = {
   Comment,
   insertComment,
   updateComment,
   getCommentsListFromStore,
+  getCommetByIdAndAccount,
 };

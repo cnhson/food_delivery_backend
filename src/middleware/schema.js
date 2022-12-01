@@ -8,7 +8,9 @@ const email = Joi.string()
   .required();
 
 const name = Joi.string().pattern(new RegExp("^[a-zA-Z]{3,250}$")).required();
+const role_id = Joi.string().valid("CUS", "SEL").required();
 const owner_id = Joi.number().min(0).required();
+const comment_id = Joi.number().min(0).required();
 const address = Joi.string().pattern(new RegExp("^[a-zA-Z]{3,250}$")).required();
 const password = Joi.string().pattern(new RegExp("^[a-zA-Z0-9!@#$%^&*()+-/]{8,100}$")).required();
 const product_id = Joi.number().min(0).required();
@@ -16,7 +18,7 @@ const account_id = Joi.number().min(0).required();
 const store_id = Joi.string().pattern(new RegExp("^[a-zA-Z]{1,25}$")).required();
 const order_id = Joi.string().pattern(new RegExp("^[a-zA-Z]{1,25}$")).required();
 const comment = Joi.string().pattern(new RegExp("^[a-zA-Z]{3,2000}$")).required();
-const image = Joi.string().required();
+const image = Joi.string();
 const star = Joi.number().required();
 const type_id = Joi.string().required();
 const description = Joi.string().required();
@@ -33,7 +35,7 @@ const date2 = Joi.date().raw();
 ////  Schemas zone //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const schemas = {
   registerAccount: Joi.object().keys({
-    role_id: Joi.string().valid("CUS", "SEL").required(),
+    role_id: role_id,
     name: name,
     email: email,
     password: password,
@@ -42,6 +44,7 @@ const schemas = {
   }),
 
   loginAccount: Joi.object().keys({
+    role_id: role_id,
     email: email,
     password: password,
   }),
@@ -49,22 +52,17 @@ const schemas = {
   createComment: Joi.object().keys({
     account_id: account_id,
     store_id: store_id,
-    product_id: product_id,
     order_id: order_id,
     comment: comment,
     image: image,
     star: star,
-    timestamp: timestamp,
   }),
 
   editComment: Joi.object().keys({
-    account_id: account_id,
-    product_id: product_id,
-    order_id: order_id,
+    comment_id: comment_id,
     comment: comment,
     image: image,
     star: star,
-    timestamp: timestamp,
   }),
 
   createProduct: Joi.object().keys({
