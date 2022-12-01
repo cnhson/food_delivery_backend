@@ -8,6 +8,8 @@ const email = Joi.string()
   .required();
 
 const name = Joi.string().pattern(new RegExp("^[a-zA-Z]{3,250}$")).required();
+const owner_id = Joi.number().min(0).required();
+const address = Joi.string().pattern(new RegExp("^[a-zA-Z]{3,250}$")).required();
 const password = Joi.string().pattern(new RegExp("^[a-zA-Z0-9!@#$%^&*()+-/]{8,100}$")).required();
 const product_id = Joi.number().min(0).required();
 const account_id = Joi.number().min(0).required();
@@ -25,14 +27,14 @@ const payment_method = Joi.string().max(25).required();
 const timestamp = Joi.string().required();
 const out_of_stock = Joi.number().valid(0, 1).required();
 const del_flag = Joi.number().valid(0, 1).required();
-const date1 = Joi.date().format("YYYY-MM-DD").raw();
-const date2 = Joi.date().format("YYYY-MM-DD").raw();
+const date1 = Joi.date().raw();
+const date2 = Joi.date().raw();
 
 ////  Schemas zone //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const schemas = {
   registerAccount: Joi.object().keys({
     role_id: Joi.string().valid("CUS", "SEL").required(),
-    name: Joi.string().pattern(new RegExp("^[a-zA-Z]{3,50}$")).required(),
+    name: name,
     email: email,
     password: password,
     repeatPassword: Joi.any().valid(Joi.ref("password")),
@@ -117,7 +119,7 @@ const schemas = {
   }),
 
   editStore: Joi.object().keys({
-    id: id,
+    id: store_id,
     owner_id: owner_id,
     name: name,
     address: address,
