@@ -5,7 +5,7 @@ const Store = sequelize.define(
   "store",
   {
     id: {
-      type: DataTypes.STRING(25),
+      type: DataTypes.STRING(10),
       primaryKey: true,
     },
     owner_id: {
@@ -35,7 +35,7 @@ const Store = sequelize.define(
       },
     },
     image: {
-      type: DataTypes.BLOB,
+      type: DataTypes.STRING(64),
     },
     active_date: {
       type: DataTypes.STRING(25),
@@ -49,22 +49,18 @@ const Store = sequelize.define(
   }
 );
 
-async function insertStore(
-  owner_id,
-  name,
-  address,
-  description,
-  type_id,
-  timestamp
-) {
+async function insertStore(id, owner_id, name, address, description, image, type_id, timestamp) {
   try {
     await Store.create({
+      id: id,
       owner_id: owner_id,
       name: name,
       address: address,
       description: description,
+      image: image,
       type_id: type_id,
-      timestamp,
+      active_date: timestamp,
+      timestamp: timestamp,
     });
 
     return true;
@@ -74,15 +70,7 @@ async function insertStore(
   }
 }
 
-async function updateStoreById(
-  id,
-  owner_id,
-  name,
-  address,
-  description,
-  type_id,
-  timestamp
-) {
+async function updateStoreById(id, owner_id, name, address, description, type_id, timestamp) {
   try {
     const data = await Store.update(
       {
@@ -128,17 +116,7 @@ async function checkStoreByName(name) {
 async function getStoreById(id) {
   try {
     const data = await Store.findAll({
-      attributes: [
-        `id`,
-        `owner_id`,
-        `name`,
-        `address`,
-        `description`,
-        `type_id`,
-        `image`,
-        `active_date`,
-        `timestamp`,
-      ],
+      attributes: [`id`, `owner_id`, `name`, `address`, `description`, `type_id`, `image`, `active_date`, `timestamp`],
       where: {
         id: id,
       },
@@ -157,17 +135,7 @@ async function getStoreById(id) {
 async function getUserStore(owner_id) {
   try {
     const data = await Store.findAll({
-      attributes: [
-        `id`,
-        `owner_id`,
-        `name`,
-        `address`,
-        `description`,
-        `type_id`,
-        `image`,
-        `active_date`,
-        `timestamp`,
-      ],
+      attributes: [`id`, `owner_id`, `name`, `address`, `description`, `type_id`, `image`, `active_date`, `timestamp`],
       where: {
         owner_id: owner_id,
       },

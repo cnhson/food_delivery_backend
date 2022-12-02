@@ -14,6 +14,7 @@ module.exports = {
 
   registerAccount: async function (req, res) {
     try {
+      const id = req.body.id;
       const role_id = req.body.role_id;
       const name = req.body.name;
       const email = req.body.email;
@@ -31,7 +32,7 @@ module.exports = {
 
           hashedPassword = hash;
           // Insert account into database
-          const result = await insertAccount(role_id, name, email, hashedPassword, timestamp);
+          const result = await insertAccount(id, role_id, name, email, hashedPassword, timestamp);
 
           if (result) {
             res.status(200).json({ message: "Register successfully" });

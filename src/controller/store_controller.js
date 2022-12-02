@@ -2,6 +2,7 @@ const { insertStore, getStoreById, getUserStore, updateStoreById } = require("..
 
 const { pendingOrder, checkNewOrders } = require("../models/order");
 const { getProductByStore } = require("../models/menu");
+const { getAllType } = require("../models/store_type");
 module.exports = {
   pending: async function (req, res) {
     try {
@@ -36,17 +37,23 @@ module.exports = {
     }
   },
 
-  createStore: async function (req, res, next) {
+  createStore: async function (req, res) {
     try {
-      const id = crypto.randomBytes(3).toString("hex");
-      const owner_id = req.session.User.id;
+      const id = req.body.id;
       const name = req.body.name;
       const address = req.body.address;
       const description = req.body.description;
+      const image = req.body.image;
       const type_id = req.body.type_id;
       const timestamp = req.body.timestamp;
+      let owner_id;
+      if (req.session.User.id) {
+        owner_id = req.session.User.id;
+      } else {
+        owner_id = req.body.owner_id;
+      }
 
-      const result = await insertStore(id, owner_id, name, address, description, type_id, timestamp);
+      const result = await insertStore(id, owner_id, name, address, description, image, type_id, timestamp);
 
       if (result) {
         res.status(200).json({ message: "Create store successfully" });
@@ -114,6 +121,16 @@ module.exports = {
       }
     } catch (err) {
       res.status(500).send(err);
+    }
+  },
+
+  getAllType: async function (req, res) {
+    try {
+      const allType = await getAllType();
+      res.status(200).json(allType);
+    } catch (err) {
+      console.log(err);
+      res.status(500).json(err);
     }
   },
 };
