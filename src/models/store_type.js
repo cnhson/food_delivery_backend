@@ -18,4 +18,8 @@ const StoreType = sequelize.define(
   }
 );
 
-module.exports = { StoreType };
+async function getAllType() {
+  return StoreType.findAll();
+}
+
+module.exports = { StoreType, getAllType };
