@@ -14,7 +14,7 @@ module.exports = {
 
   registerAccount: async function (req, res) {
     try {
-      const role_id = req.body.role;
+      const role_id = req.body.role_id;
       const name = req.body.name;
       const email = req.body.email;
       const password = req.body.password;
@@ -36,7 +36,7 @@ module.exports = {
           if (result) {
             res.status(200).json({ message: "Register successfully" });
           } else {
-            res.status(200).json({ error: "This email is already exists" });
+            res.status(500).json({ error: "This email is already exists" });
           }
         });
       });
@@ -51,6 +51,7 @@ module.exports = {
       const password = req.body.password;
       const role_id = req.body.role_id;
 
+      console.log(email);
       // Check if given account is exists
       let account = await getAccountByEmailAndRole(email, role_id);
       if (account === null) {
@@ -77,6 +78,7 @@ module.exports = {
           email: account.email,
           role: account.role_id,
         };
+        res.status(200).json({ message: "Login successfully!" });
       });
     } catch (err) {
       console.log(err);

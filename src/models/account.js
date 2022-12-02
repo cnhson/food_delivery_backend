@@ -64,7 +64,7 @@ async function getAccountByEmailAndRole(email, role_id) {
   try {
     const data = await Account.findAll({
       where: {
-        [Op.or]: [
+        [Op.and]: [
           {
             email: {
               [Op.eq]: email,
