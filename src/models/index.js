@@ -22,6 +22,6 @@ Menu.belongsTo(Store, { foreignKey: "store_id", sourceKey: "id" });
 Store.hasMany(Menu, { foreignKey: "store_id", sourceKey: "id" });
 ProductType.belongsTo(Menu, { foreignKey: "type_id", sourceKey: "id" });
 Order.hasOne(orderDetail, { foreignKey: "order_id", sourceKey: "id" });
-Store.hasMany(Order, { foreignKey: "id", sourceKey: "store_id" });
+Store.hasMany(Order, { foreignKey: "store_id", sourceKey: "id" });
 
 console.log("\nAssociation done!!\n");

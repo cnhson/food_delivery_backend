@@ -7,7 +7,11 @@ const email = Joi.string()
   })
   .required();
 
-const name = Joi.string().pattern(new RegExp("^[a-zA-Z]{3,250}$")).required();
+const name = Joi.string()
+  .required()
+  .min(3)
+  .max(255)
+  .regex(/^\s*\w+(?:[^\w,]+\w+)*[^,\w]*$/);
 const role_id = Joi.string().valid("CUS", "SEL").required();
 const owner_id = Joi.number().min(0).required();
 const comment_id = Joi.number().min(0).required();

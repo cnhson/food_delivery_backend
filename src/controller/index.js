@@ -15,7 +15,7 @@ module.exports = {
     try {
       await sequelize.sync();
       await insertDefaultRole();
-      res.json("Create all table successfully");
+      res.status(200).json("Create all table successfully");
     } catch (err) {
       console.log(err);
       res.send(err);
