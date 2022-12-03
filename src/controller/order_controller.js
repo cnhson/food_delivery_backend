@@ -30,9 +30,8 @@ module.exports = {
       let arraydata = [];
 
       for (const index in data) {
-        arraydata.push([data[index].otimestamp, data[index].total]);
+        arraydata.push([parseInt(data[index].otimestamp), data[index].total]);
       }
-
       res.status(200).json(arraydata);
     } catch (err) {
       res.status(500).send(err);
