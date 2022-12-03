@@ -5,8 +5,7 @@ const Account = sequelize.define(
   "account",
   {
     id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
+      type: DataTypes.STRING(25),
       primaryKey: true,
     },
     role_id: {
@@ -43,9 +42,10 @@ const Account = sequelize.define(
   }
 );
 
-async function insertAccount(role_id, name, email, password, timestamp) {
+async function insertAccount(id, role_id, name, email, password, timestamp) {
   try {
     await Account.create({
+      id: id,
       role_id: role_id,
       name: name,
       email: email,

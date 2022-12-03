@@ -12,26 +12,34 @@ const name = Joi.string()
   .min(3)
   .max(255)
   .regex(/^\s*\w+(?:[^\w,]+\w+)*[^,\w]*$/);
+const address = name;
+const description = name;
+
 const role_id = Joi.string().valid("CUS", "SEL").required();
-const owner_id = Joi.number().min(0).required();
+const owner_id = Joi.string().length(10);
 const comment_id = Joi.number().min(0).required();
-const address = Joi.string().pattern(new RegExp("^[a-zA-Z]{3,250}$")).required();
+
 const password = Joi.string().pattern(new RegExp("^[a-zA-Z0-9!@#$%^&*()+-/]{8,100}$")).required();
 const product_id = Joi.number().min(0).required();
 const account_id = Joi.number().min(0).required();
-const store_id = Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{0,6}$")).required();
+
+const store_id = Joi.string().length(10).required();
+
 const order_id = Joi.string().pattern(new RegExp("^[a-zA-Z]{1,25}$")).required();
 const comment = Joi.string().pattern(new RegExp("^[a-zA-Z]{3,2000}$")).required();
-const image = Joi.string();
+
+const image = Joi.string().alphanum().required();
 const star = Joi.number().required();
-const type_id = Joi.string().required();
-const description = Joi.string().required();
+const type_id = Joi.string().alphanum().required();
+
 const price = Joi.string().max(25).required();
 const quantity = Joi.string().max(25).required();
 const ship_fee = Joi.string().max(25).required();
-const payment_method = Joi.string().max(25).required();
+
+const payment_method = Joi.string().alphanum().required();
 const timestamp = Joi.string().required();
 const out_of_stock = Joi.number().valid(0, 1).required();
+
 const del_flag = Joi.number().valid(0, 1).required();
 const date1 = Joi.date().raw();
 const date2 = Joi.date().raw();
@@ -110,10 +118,12 @@ const schemas = {
   }),
 
   createStore: Joi.object().keys({
+    id: store_id,
     owner_id: owner_id,
     name: name,
     address: address,
     description: description,
+    image: image,
     type_id: type_id,
     timestamp: timestamp,
   }),
