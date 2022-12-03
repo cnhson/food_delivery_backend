@@ -1,10 +1,4 @@
-const {
-  getAllProduct,
-  getProductByName,
-  addProduct,
-  getProductDetail,
-  updateProductById,
-} = require("../models/menu");
+const { getAllProduct, getProductByName, addProduct, getProductDetail, updateProductById } = require("../models/menu");
 
 const { getCommentsListFromStore } = require("../models/comment");
 
@@ -28,14 +22,7 @@ module.exports = {
         res.status(200).json({ error: "Check id again" });
         return;
       } else {
-        const result = await addProduct(
-          store_id,
-          name,
-          description,
-          type_id,
-          image,
-          price
-        );
+        const result = await addProduct(store_id, name, description, type_id, image, price);
         if (result) {
           res.status(200).json("Add product successfully");
           return;
@@ -62,17 +49,7 @@ module.exports = {
       const out_of_stock = req.body.out_of_stock;
       const del_flag = req.body.del_flag;
 
-      const result = await editProduct(
-        id,
-        store_id,
-        name,
-        description,
-        type_id,
-        image,
-        price,
-        out_of_stock,
-        del_flag
-      );
+      const result = await editProduct(id, store_id, name, description, type_id, image, price, out_of_stock, del_flag);
       if (result) {
         res.status(200).json("Edit product successfully");
         return;

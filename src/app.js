@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const routes = require("./routes");
-const session = require('express-session');
+const session = require("express-session");
 // const cron = require("./cron-job");
 
 require("dotenv").config();
@@ -19,11 +19,14 @@ app.use(cors());
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
-app.use(session({
-  resave: true, 
-  saveUninitialized: true, 
-  secret: 'test', 
-  cookie: { maxAge: 60000 }}));
+app.use(
+  session({
+    resave: true,
+    saveUninitialized: true,
+    secret: "test",
+    cookie: { maxAge: 3600000 },
+  })
+);
 
 /* CROS middleware */
 app.use(function (req, res, next) {
@@ -35,10 +38,7 @@ app.use(function (req, res, next) {
     res.setHeader("Access-Control-Allow-Origin", origin);
   }
 
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
 

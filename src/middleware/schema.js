@@ -19,7 +19,7 @@ const address = Joi.string().pattern(new RegExp("^[a-zA-Z]{3,250}$")).required()
 const password = Joi.string().pattern(new RegExp("^[a-zA-Z0-9!@#$%^&*()+-/]{8,100}$")).required();
 const product_id = Joi.number().min(0).required();
 const account_id = Joi.number().min(0).required();
-const store_id = Joi.string().pattern(new RegExp("^[a-zA-Z]{1,25}$")).required();
+const store_id = Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{0,6}$")).required();
 const order_id = Joi.string().pattern(new RegExp("^[a-zA-Z]{1,25}$")).required();
 const comment = Joi.string().pattern(new RegExp("^[a-zA-Z]{3,2000}$")).required();
 const image = Joi.string();
@@ -90,7 +90,6 @@ const schemas = {
   }),
 
   createOrder: Joi.object().keys({
-    account_id: account_id,
     store_id: store_id,
     product_id: product_id,
     quantity: quantity,
@@ -102,8 +101,7 @@ const schemas = {
 
   calculate: Joi.object().keys({
     store_id: store_id,
-    date1: date1,
-    date2: date2,
+    page_id: Joi.number().required(),
   }),
 
   receive: Joi.object().keys({
@@ -130,12 +128,5 @@ const schemas = {
     timestamp: timestamp,
   }),
 };
-
-// const owner_id = req.session.User.id;
-// const name = req.body.name;
-// const address = req.body.address;
-// const description = req.body.description;
-// const type_id = req.body.type_id;
-// const timestamp = req.body.timestamp;
 
 module.exports = schemas;

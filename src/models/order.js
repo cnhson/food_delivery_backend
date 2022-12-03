@@ -55,10 +55,11 @@ const Order = sequelize.define(
   }
 );
 
-async function insertOrder(id, account_id, price, ship_fee, payment_method, timestamp) {
+async function insertOrder(id, store_id, account_id, price, ship_fee, payment_method, timestamp) {
   try {
     await Order.create({
       id: id,
+      store_id: store_id,
       account_id: account_id,
       price: price,
       ship_fee: ship_fee,
@@ -158,9 +159,7 @@ async function checkNewOrders(store_id) {
       },
       where: {
         status: "received",
-        id: {
-          [Op.like]: "%" + store_id + "%",
-        },
+        store_id: store_id,
       },
     });
     return data;
@@ -191,6 +190,28 @@ async function calculateTotal(store_id, mil1, mil2) {
   }
 }
 
+async function calculateTotalWithLimit(store_id, limit, skip) {
+  try {
+    const data = await sequelize.query(
+      "SELECT FROM_UNIXTIME(ord.timestamp/1000, '%Y-%m-%d') 'only_date', SUM(price + ship_fee * quantity ) 'total' FROM food_delivery.order ord " +
+        "inner join order_detail od on ord.id = od.order_id " +
+        "where store_id = '" +
+        store_id +
+        "' group by only_date order by only_date limit " +
+        limit +
+        " offset " +
+        skip,
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+    return data;
+  } catch (err) {
+    console.log(err);
+    return 0;
+  }
+}
+
 module.exports = {
   Order,
   insertOrder,
@@ -200,4 +221,5 @@ module.exports = {
   checkNewOrders,
   pendingOrder,
   receiveOrder,
+  calculateTotalWithLimit,
 };

@@ -2,17 +2,11 @@ const {
   insertOrder,
   getUserOrderList,
   calculateTotal,
+  calculateTotalWithLimit,
   receiveOrder,
 } = require("../models/order");
 const { insertOrderDetail } = require("../models/order_detail");
 const crypto = require("crypto");
-
-// account_id: account_id,
-// product_id: product_id,
-// quantity: quantity,
-// payment_method: payment_method,
-// status: status,
-// timestamp,
 
 module.exports = {
   receive: async function (req, res) {
@@ -27,7 +21,7 @@ module.exports = {
     }
   },
 
-  calculate: async function (req, res) {
+  getArrayCalculation: async function (req, res) {
     try {
       const store_id = req.body.store_id;
       const str_date1 = req.body.date1;
@@ -50,46 +44,36 @@ module.exports = {
     }
   },
 
-  test: async function (req, res) {
-    const rid1 = crypto.randomBytes(3).toString("hex");
-    const rid2 = crypto.randomBytes(3).toString("hex");
-    res.status(200).json({ r1: rid1, r2: rid2 });
-  },
-
   createOrder: async function (req, res) {
     try {
-      const account_id = req.session.User.id;
-      const store_id = req.body.store_id;
-      const product_id = req.body.product_id;
-      // create random order id - length(6)
-      const oid = crypto.randomBytes(3).toString("hex");
-      const final_id = "S" + store_id + "O" + oid;
-      // Create order's id
-      const id = final_id;
-      const quantity = req.body.quantity;
-      const payment_method = req.body.payment_method;
-      const ship_fee = req.body.ship_fee;
-      const price = req.body.price;
-      const timestamp = req.body.timestamp;
+      if (req.session.User.id === null) {
+        res.status(500).send("Please login!");
+      } else {
+        const account_id = req.session.User.id;
+        const store_id = req.body.store_id;
+        const product_id = req.body.product_id;
+        // create random order id - length(6)
+        const rid = crypto.randomBytes(3).toString("hex");
+        const oid = "O" + rid;
+        // Create order's id
+        const quantity = req.body.quantity;
+        const payment_method = req.body.payment_method;
+        const ship_fee = req.body.ship_fee;
+        const price = req.body.price;
+        const timestamp = req.body.timestamp;
+        console.log("ramdon id: " + oid);
+        const result1 = insertOrder(oid, store_id, account_id, price, ship_fee, payment_method, timestamp);
 
-      const result1 = insertOrder(
-        id,
-        account_id,
-        price,
-        ship_fee,
-        payment_method,
-        timestamp
-      );
+        const result2 = insertOrderDetail(oid, product_id, quantity);
 
-      const result2 = insertOrderDetail(id, product_id, quantity);
+        const result = await Promise.all([result1, result2]);
 
-      const result = await Promise.all([result1, result2]);
-
-      if (result) {
-        res.status(200).json({ message: "Create order successfully" });
+        if (result) {
+          res.status(200).json({ message: "Create order successfully" });
+        }
       }
     } catch (err) {
-      res.status(500).send(err);
+      res.status(500).send("Opsi");
     }
   },
 
@@ -113,4 +97,26 @@ module.exports = {
       res.status(500).send(err);
     }
   },
+
+  test: async function (req, res) {
+    const rid1 = crypto.randomBytes(3).toString("hex");
+    const rid2 = crypto.randomBytes(3).toString("hex");
+    res.status(200).json({ r1: rid1, r2: rid2 });
+  },
+
+  // profitPerDate: async function (req, res) {
+  //   try {
+  //     const store_id = req.body.store_id;
+
+  //     const page = req.body.page_id;
+  //     const PAGE_SIZE = 5;
+  //     const skip = (page - 1) * PAGE_SIZE;
+
+  //     const records = await calculateTotalWithLimit(store_id, PAGE_SIZE, skip);
+
+  //     res.status(200).json({ page, records });
+  //   } catch (err) {
+  //     res.status(500).send("WTF calculate");
+  //   }
+  // },
 };
