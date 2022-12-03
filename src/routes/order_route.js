@@ -6,7 +6,7 @@ const schemas = require("../middleware/schema");
 router.get("/history/:status", order.orderHistory);
 
 router.route("/create").post(middleware(schemas.createOrder, PROPERTY_TYPE.body), order.createOrder);
-//router.route("/calculate").get(middleware(schemas.calculate, PROPERTY_TYPE.body), order.profitPerDate);
+router.route("/calculate").get(middleware(schemas.profitPerDay, PROPERTY_TYPE.body), order.profitPerDate);
 router.route("/status-change/receive").post(middleware(schemas.receive, PROPERTY_TYPE.body), order.receive);
 
 //test

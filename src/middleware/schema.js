@@ -107,9 +107,9 @@ const schemas = {
     timestamp: timestamp,
   }),
 
-  calculate: Joi.object().keys({
+  profitPerDay: Joi.object().keys({
     store_id: store_id,
-    page_id: Joi.number().required(),
+    limit: Joi.number().required(),
   }),
 
   receive: Joi.object().keys({

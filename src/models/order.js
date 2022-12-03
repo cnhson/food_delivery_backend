@@ -169,16 +169,16 @@ async function checkNewOrders(store_id) {
   }
 }
 
-async function calculateTotal(store_id, mil1, mil2) {
+async function calculateTotalPerDayWithLimit(store_id, limit) {
   try {
     const data = await sequelize.query(
-      "select sum(price*quantity) 'total_sum' from food_delivery.order o inner join order_detail od on o.id = od.order_id where o.id like '%S%" +
+      "SELECT Round(UNIX_TIMESTAMP(FROM_UNIXTIME(ord.timestamp/1000, '%Y-%m-%d'))*1000) 'otimestamp'," +
+        " SUM(price + ship_fee * quantity ) 'total' FROM food_delivery.order ord " +
+        "inner join order_detail od on ord.id = od.order_id " +
+        "where store_id = '" +
         store_id +
-        "%O%' and (timestamp between " +
-        mil1 +
-        " and " +
-        mil2 +
-        ")",
+        "' group by otimestamp order by otimestamp desc limit " +
+        limit,
       {
         type: QueryTypes.SELECT,
       }
@@ -190,36 +190,35 @@ async function calculateTotal(store_id, mil1, mil2) {
   }
 }
 
-async function calculateTotalWithLimit(store_id, limit, skip) {
-  try {
-    const data = await sequelize.query(
-      "SELECT FROM_UNIXTIME(ord.timestamp/1000, '%Y-%m-%d') 'only_date', SUM(price + ship_fee * quantity ) 'total' FROM food_delivery.order ord " +
-        "inner join order_detail od on ord.id = od.order_id " +
-        "where store_id = '" +
-        store_id +
-        "' group by only_date order by only_date limit " +
-        limit +
-        " offset " +
-        skip,
-      {
-        type: QueryTypes.SELECT,
-      }
-    );
-    return data;
-  } catch (err) {
-    console.log(err);
-    return 0;
-  }
-}
+// async function calculateTotalPerDayWithLimit(store_id, limit, skip) {
+//   try {
+//     const data = await sequelize.query(
+//       "SELECT FROM_UNIXTIME(ord.timestamp/1000, '%Y-%m-%d') 'only_date', SUM(price + ship_fee * quantity ) 'total' FROM food_delivery.order ord " +
+//         "inner join order_detail od on ord.id = od.order_id " +
+//         "where store_id = '" +
+//         store_id +
+//         "' group by only_date order by only_date limit " +
+//         limit +
+//         " offset " +
+//         skip,
+//       {
+//         type: QueryTypes.SELECT,
+//       }
+//     );
+//     return data;
+//   } catch (err) {
+//     console.log(err);
+//     return 0;
+//   }
+// }
 
 module.exports = {
   Order,
   insertOrder,
   getOrderByAccount,
   getUserOrderList,
-  calculateTotal,
   checkNewOrders,
   pendingOrder,
   receiveOrder,
-  calculateTotalWithLimit,
+  calculateTotalPerDayWithLimit,
 };
