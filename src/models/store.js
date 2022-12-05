@@ -9,7 +9,7 @@ const Store = sequelize.define(
       primaryKey: true,
     },
     owner_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(10),
       allowNull: false,
       references: {
         model: "account",
