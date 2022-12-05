@@ -47,6 +47,7 @@ const date2 = Joi.date().raw();
 ////  Schemas zone //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const schemas = {
   registerAccount: Joi.object().keys({
+    id: owner_id,
     role_id: role_id,
     name: name,
     email: email,
@@ -136,6 +137,9 @@ const schemas = {
     description: description,
     type_id: type_id,
     timestamp: timestamp,
+  }),
+  userId: Joi.object().keys({
+    userId: owner_id,
   }),
 };
 

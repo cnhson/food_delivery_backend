@@ -18,7 +18,7 @@ const Order = sequelize.define(
       },
     },
     account_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(10),
       allowNull: false,
       references: {
         model: "account",

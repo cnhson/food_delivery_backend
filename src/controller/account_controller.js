@@ -1,4 +1,4 @@
-const { insertAccount, getAccountByEmailAndRole } = require("../models/account");
+const { insertAccount, getAccountByEmailAndRole, getAccountById } = require("../models/account");
 const bcrypt = require("bcryptjs");
 const session = require("express-session");
 
@@ -52,7 +52,6 @@ module.exports = {
       const password = req.body.password;
       const role_id = req.body.role_id;
 
-      console.log(email);
       // Check if given account is exists
       let account = await getAccountByEmailAndRole(email, role_id);
       if (account === null) {
@@ -72,18 +71,23 @@ module.exports = {
           res.status(200).json({ error: "Password is incorrect" });
           return;
         }
-        //Create session
-        req.session.User = {
-          id: account.id,
-          name: account.name,
-          email: account.email,
-          role: account.role_id,
-        };
-        res.status(200).json({ message: "Login successfully!" });
+
+        res.status(200).json({ message: "Login successfully!", userId: account.id });
       });
     } catch (err) {
       console.log(err);
       res.status(500).send(err);
+    }
+  },
+
+  getAccount: async function (req, res) {
+    try {
+      const userId = req.params.userId;
+
+      const data = await getAccountById(userId);
+      res.status(200).json(data[0]);
+    } catch (err) {
+      res.status(500).json({ error: err });
     }
   },
 };
