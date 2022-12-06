@@ -36,7 +36,7 @@ const Menu = sequelize.define(
       },
     },
     image: {
-      type: DataTypes.BLOB,
+      type: DataTypes.STRING(64),
     },
     price: {
       type: DataTypes.STRING(25),
@@ -65,8 +65,6 @@ async function addProduct(store_id, name, description, type_id, image, price) {
       type_id: type_id,
       image: image,
       price: price,
-      out_of_stock: false,
-      del_flag: false,
     });
     return true;
   } catch (err) {
@@ -76,30 +74,17 @@ async function addProduct(store_id, name, description, type_id, image, price) {
 }
 
 async function getProductByStore(store_id) {
-  try {
-    const data = await Menu.findAll({
-      where: {
-        store_id: store_id,
-      },
-    });
-    if (data.length > 0) return data;
-    else return null;
-  } catch (error) {}
+  return await Menu.findAll({
+    where: {
+      store_id: store_id,
+    },
+  });
 }
 
 async function getProductByName(name) {
   try {
     const data = await Menu.findAll({
-      attributes: [
-        "id",
-        "store_id",
-        "name",
-        "description",
-        "image",
-        "price",
-        "out_of_stock",
-        "del_flag",
-      ],
+      attributes: ["id", "store_id", "name", "description", "image", "price", "out_of_stock", "del_flag"],
       include: {
         model: ProductType,
         attributes: ["name"],
@@ -121,16 +106,7 @@ async function getProductByName(name) {
 async function getAllProduct() {
   try {
     const data = await Menu.findAll({
-      attributes: [
-        "id",
-        "store_id",
-        "name",
-        "description",
-        "image",
-        "price",
-        "out_of_stock",
-        "del_flag",
-      ],
+      attributes: ["id", "store_id", "name", "description", "image", "price", "out_of_stock", "del_flag"],
       include: {
         model: ProductType,
         attributes: ["name"],
@@ -144,16 +120,7 @@ async function getAllProduct() {
   }
 }
 
-async function updateProductById(
-  id,
-  store_id,
-  name,
-  description,
-  image,
-  price,
-  out_of_stock,
-  del_flag
-) {
+async function updateProductById(id, store_id, name, description, image, price, out_of_stock, del_flag) {
   try {
     const data = await Menu.update(
       {

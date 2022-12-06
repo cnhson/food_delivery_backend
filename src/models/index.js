@@ -16,12 +16,12 @@ sequelize
     console.log(err);
   });
 
-//Create association between models
-Menu.hasOne(ProductType, { foreignKey: "type_id", sourceKey: "id" });
-Menu.belongsTo(Store, { foreignKey: "store_id", sourceKey: "id" });
-Store.hasMany(Menu, { foreignKey: "store_id", sourceKey: "id" });
-ProductType.belongsTo(Menu, { foreignKey: "type_id", sourceKey: "id" });
-Order.hasOne(orderDetail, { foreignKey: "order_id", sourceKey: "id" });
-Store.hasMany(Order, { foreignKey: "store_id", sourceKey: "id" });
+// //Create association between models
+// Menu.hasOne(ProductType, { foreignKey: "type_id", sourceKey: "id" });
+// Menu.belongsTo(Store, { foreignKey: "store_id", sourceKey: "id" });
+// Store.hasMany(Menu, { foreignKey: "store_id", sourceKey: "id" });
+// ProductType.belongsTo(Menu, { foreignKey: "type_id", sourceKey: "id" });
+// Order.hasOne(orderDetail, { foreignKey: "order_id", sourceKey: "id" });
+// Store.hasMany(Order, { foreignKey: "store_id", sourceKey: "id" });
 
 console.log("\nAssociation done!!\n");

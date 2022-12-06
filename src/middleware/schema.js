@@ -16,13 +16,14 @@ const address = name;
 const description = name;
 
 const role_id = Joi.string().valid("CUS", "SEL").required();
-const owner_id = Joi.string().length(10);
+const owner_id = Joi.string().length(10).required();
 const comment_id = Joi.number().min(0).required();
 
 const password = Joi.string().pattern(new RegExp("^[a-zA-Z0-9!@#$%^&*()+-/]{8,100}$")).required();
 const product_id = Joi.number().min(0).required();
 const account_id = Joi.number().min(0).required();
 
+const product_type_id = Joi.string().length(10).required();
 const store_id = Joi.string().length(10).required();
 
 const order_id = Joi.string().pattern(new RegExp("^[a-zA-Z]{1,25}$")).required();
@@ -32,7 +33,7 @@ const image = Joi.string().alphanum().required();
 const star = Joi.number().required();
 const type_id = Joi.string().alphanum().required();
 
-const price = Joi.string().max(25).required();
+const price = Joi.string().min(1).max(25).required();
 const quantity = Joi.string().max(25).required();
 const ship_fee = Joi.string().max(25).required();
 
@@ -82,9 +83,15 @@ const schemas = {
     store_id: store_id,
     name: name,
     description: description,
-    type_id: type_id,
+    type_id: product_type_id,
     image: image,
     price: price,
+  }),
+
+  createProductType: Joi.object().keys({
+    id: product_type_id,
+    name: name,
+    store_id: store_id,
   }),
 
   editProduct: Joi.object().keys({
@@ -140,6 +147,9 @@ const schemas = {
   }),
   userId: Joi.object().keys({
     userId: owner_id,
+  }),
+  storeId: Joi.object().keys({
+    storeId: store_id,
   }),
 };
 
