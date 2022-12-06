@@ -1,6 +1,7 @@
 const { insertAccount, getAccountByEmailAndRole, getAccountById } = require("../models/account");
 const bcrypt = require("bcryptjs");
 const session = require("express-session");
+const { getUserStore } = require("../models/store");
 
 module.exports = {
   logoutAccount: async function (req, res) {
@@ -61,7 +62,7 @@ module.exports = {
       account = account[0];
       //console.log(account[0].password);
       const hashedPassword = account.password;
-      bcrypt.compare(password, hashedPassword, function (err, isMatch) {
+      bcrypt.compare(password, hashedPassword, async function (err, isMatch) {
         if (err) {
           res.status(200).json({ error: err });
           return;
@@ -71,8 +72,10 @@ module.exports = {
           res.status(200).json({ error: "Password is incorrect" });
           return;
         }
+        // get store id
+        const store = await getUserStore(account.id);
 
-        res.status(200).json({ message: "Login successfully!", userId: account.id });
+        res.status(200).json({ message: "Login successfully!", userId: account.id, storeId: store[0].id });
       });
     } catch (err) {
       console.log(err);

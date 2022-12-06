@@ -1,6 +1,8 @@
 const { getAllProduct, getProductByName, addProduct, getProductDetail, updateProductById } = require("../models/menu");
 
 const { getCommentsListFromStore } = require("../models/comment");
+const { insertProductType, getProductTypeByStoreId } = require("../models/product_type");
+const { getStoreById } = require("../models/store");
 
 module.exports = {
   test: async function (req, res) {
@@ -9,27 +11,27 @@ module.exports = {
     res.status(200).json("menu:" + oid);
   },
 
-  createProduct: async function (req, res, next) {
-    try {
-      const store_id = req.body.store_id;
-      const name = req.body.name;
-      const description = req.body.description;
-      const type_id = req.body.type_id;
-      const image = req.body.image;
-      const price = req.body.price;
+  createProduct: async function (req, res) {
+    const store_id = req.body.store_id;
+    const name = req.body.name;
+    const description = req.body.description;
+    const type_id = req.body.type_id;
+    const image = req.body.image;
+    const price = req.body.price;
 
-      if (store_id === null || type_id === null || id === null) {
-        res.status(200).json({ error: "Check id again" });
+    try {
+      // check store id if exists
+      const check = await getStoreById(store_id);
+      if (check.length === 0) {
+        res.status(402).json({ error: "Store does not exists" });
         return;
+      }
+
+      const result = await addProduct(store_id, name, description, type_id, image, price);
+      if (result) {
+        res.status(200).json({ message: "Create new product successfully!" });
       } else {
-        const result = await addProduct(store_id, name, description, type_id, image, price);
-        if (result) {
-          res.status(200).json("Add product successfully");
-          return;
-        } else {
-          res.status(200).json("Fail to add product");
-          return;
-        }
+        res.status(500).json({ error: "Create new product Failed!" });
       }
     } catch (err) {
       console.log(err);
@@ -122,6 +124,35 @@ module.exports = {
     } catch (err) {
       console.log("err");
       res.status(500).send(err);
+    }
+  },
+
+  createProductType: async function (req, res) {
+    const id = req.body.id;
+    const name = req.body.name;
+    const store_id = req.body.store_id;
+
+    try {
+      const result = await insertProductType(id, name, store_id);
+      if (result) {
+        res.status(200).json({ message: "Create product type successfully!" });
+      } else {
+        res.status(500).json({ error: "Create product type failed!" });
+      }
+    } catch (err) {
+      console.log(err);
+      res.send(err);
+    }
+  },
+
+  getAllProductType: async function (req, res) {
+    const storeId = req.params.storeId;
+
+    try {
+      const result = await getProductTypeByStoreId(storeId);
+      res.status(200).json(result);
+    } catch (err) {
+      res.send(err);
     }
   },
 };

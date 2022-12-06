@@ -46,12 +46,7 @@ module.exports = {
       const image = req.body.image;
       const type_id = req.body.type_id;
       const timestamp = req.body.timestamp;
-      let owner_id;
-      if (req.session.User.id) {
-        owner_id = req.session.User.id;
-      } else {
-        owner_id = req.body.owner_id;
-      }
+      const owner_id = req.body.owner_id;
 
       const result = await insertStore(id, owner_id, name, address, description, image, type_id, timestamp);
 
@@ -59,6 +54,7 @@ module.exports = {
         res.status(200).json({ message: "Create store successfully" });
       }
     } catch (err) {
+      console.log(err);
       res.status(500).send(err);
     }
   },
