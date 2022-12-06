@@ -96,18 +96,17 @@ async function getOrderByAccount(account_id, order_id) {
 
 async function getUserOrderList(account_id, status) {
   try {
-    const data = await Order.findAll({
-      include: {
-        model: orderDetail,
-        attributes: ["product_id", "quantity"],
-      },
-      where: {
-        account_id: account_id,
-        status: {
-          [Op.like]: "%" + status + "%",
-        },
-      },
-    });
+    const data = await sequelize.query(
+      "select o.id, account_id, product_id,quantity,price, ship_fee, o.timestamp, payment_method, status from food_delivery.order o " +
+        "inner join order_detail od on o.id = od.order_id where account_id = " +
+        account_id +
+        " and status like '%" +
+        status +
+        "%'",
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
     return data;
   } catch (err) {
     console.log(err);
@@ -151,17 +150,14 @@ async function receiveOrder(id, account_id) {
 
 async function checkNewOrders(store_id) {
   try {
-    const data = await Order.findAll({
-      attributes: ["id", "account_id", "price", "ship_fee", "timestamp", "payment_method", "status"],
-      include: {
-        model: orderDetail,
-        attributes: ["product_id", "quantity"],
-      },
-      where: {
-        status: "received",
-        store_id: store_id,
-      },
-    });
+    const data = await sequelize.query(
+      "select o.id, account_id, product_id,quantity,price, ship_fee, o.timestamp, payment_method, status from food_delivery.order o " +
+        "inner join order_detail od on o.id = od.order_id where status = 'received' and store_id = " +
+        store_id,
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
     return data;
   } catch (err) {
     console.log(err);

@@ -83,18 +83,15 @@ async function getProductByStore(store_id) {
 
 async function getProductByName(name) {
   try {
-    const data = await Menu.findAll({
-      attributes: ["id", "store_id", "name", "description", "image", "price", "out_of_stock", "del_flag"],
-      include: {
-        model: ProductType,
-        attributes: ["name"],
-      },
-      where: {
-        name: {
-          [Op.like]: "%" + name + "%",
-        },
-      },
-    });
+    const data = await sequelize.query(
+      "select m.id, store_id, m.name, type_id, pt.name 'type_name', m.description, image, price, out_of_stock, del_flag from menu m " +
+        "inner join product_type pt on m.type_id = pt.id where m.name like '%" +
+        name +
+        "%'",
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
     if (data.length > 0) return data;
     else return null;
   } catch (err) {
@@ -105,13 +102,13 @@ async function getProductByName(name) {
 
 async function getAllProduct() {
   try {
-    const data = await Menu.findAll({
-      attributes: ["id", "store_id", "name", "description", "image", "price", "out_of_stock", "del_flag"],
-      include: {
-        model: ProductType,
-        attributes: ["name"],
-      },
-    });
+    const data = await sequelize.query(
+      "select m.id, store_id, m.name, type_id, pt.name 'type_name', m.description, image, price, out_of_stock, del_flag from menu m " +
+        "inner join product_type pt on m.type_id = pt.id",
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
     if (data.length > 0) return data;
     else return null;
   } catch (err) {
@@ -152,18 +149,18 @@ async function getProductDetail(id) {
     //Filter product info
     const p_info = await sequelize.query(
       "SELECT m.id, m.name, m.description 'des', p.name 'type', m.image, price, m.out_of_stock, m.del_flag " +
-        "from menu m inner join product_type p on m.type_id = p.id where m.id = ?",
+        "from menu m inner join product_type p on m.type_id = p.id where m.id = " +
+        id,
       {
-        replacements: [id],
         type: QueryTypes.SELECT,
       }
     );
     //Filter product store
     const p_store = await sequelize.query(
       "SELECT s.id 'sid', owner_id, s.name 'sname', s.address, s.description 'sdes', s.type_id 'stype', s.active_date " +
-        "from menu m inner join store s on m.store_id = s.id where m.id = ?",
+        "from menu m inner join store s on m.store_id = s.id where m.id = " +
+        id,
       {
-        replacements: [id],
         type: QueryTypes.SELECT,
       }
     );
