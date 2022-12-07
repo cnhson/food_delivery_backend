@@ -64,7 +64,7 @@ async function insertOrder(order_id, store_id, account_id, price, ship_fee, paym
       price: price,
       ship_fee: ship_fee,
       payment_method: payment_method,
-      status: "received",
+      status: "noticed",
       timestamp: timestamp,
     });
 
@@ -134,7 +134,7 @@ async function pendingOrder(id, account_id) {
 async function receiveOrder(id, account_id) {
   try {
     await Order.update({
-      status: "done",
+      status: "received",
       where: {
         id: id,
         account_id: account_id,
@@ -152,7 +152,7 @@ async function checkNewOrders(store_id) {
   try {
     const data = await sequelize.query(
       "select o.id, account_id, product_id,quantity,price, ship_fee, o.timestamp, payment_method, status from food_delivery.order o " +
-        "inner join order_detail od on o.id = od.order_id where status = 'received' and store_id = " +
+        "inner join order_detail od on o.id = od.order_id where status = 'noticed' and store_id = " +
         store_id,
       {
         type: QueryTypes.SELECT,
