@@ -159,6 +159,9 @@ const schemas = {
   storeId: Joi.object().keys({
     storeId: store_id,
   }),
+  product_id: Joi.object().keys({
+    product_id: product_id,
+  }),
 };
 
 module.exports = schemas;
