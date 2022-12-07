@@ -33,7 +33,7 @@ const comment = Joi.string().pattern(new RegExp("^[a-zA-Z]{3,2000}$")).required(
 
 const image = Joi.string().alphanum().required();
 const star = Joi.number().required();
-const type_id = Joi.string().alphanum().required();
+const type_id = Joi.string().alphanum().length(10).required();
 
 const price = Joi.string().min(1).max(25).required();
 const quantity = Joi.string().max(25).required();
@@ -106,6 +106,12 @@ const schemas = {
     price: price,
   }),
 
+  editProductType: Joi.object().keys({
+    id: type_id,
+    store_id: store_id,
+    name: name,
+  }),
+
   createOrder: Joi.object().keys({
     order_id: order_id,
     account_id: account_id,
@@ -170,6 +176,9 @@ const schemas = {
 
   product_id: Joi.object().keys({
     product_id: product_id,
+  }),
+  type_id: Joi.object().keys({
+    type_id: type_id,
   }),
 };
 

@@ -9,7 +9,13 @@ const {
 } = require("../models/menu");
 
 const { getCommentsListFromStore } = require("../models/comment");
-const { insertProductType, getProductTypeByStoreId, getProductTypeById } = require("../models/product_type");
+const {
+  insertProductType,
+  getProductTypeByStoreId,
+  getProductTypeById,
+  getProductTypeByIdAndStoreId,
+  editProductType,
+} = require("../models/product_type");
 const { getStoreById } = require("../models/store");
 
 module.exports = {
@@ -79,17 +85,46 @@ module.exports = {
     }
   },
 
+  updateProductType: async function (req, res, next) {
+    try {
+      const id = req.body.id;
+      const store_id = req.body.store_id;
+      const name = req.body.name;
+
+      // check if store_id is own this product type
+      const check = await getProductTypeByIdAndStoreId(id, store_id);
+      if (check.length === 0) {
+        res.status(500).json({ error: "This product does not belong to the store" });
+        return;
+      }
+
+      // edit product
+      const result = await editProductType(id, name);
+      if (result) {
+        res.status(200).json({ message: "Edit product successfully" });
+        return;
+      } else {
+        res.status(200).json({ error: "Fail to edit product" });
+        return;
+      }
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+  },
+
   getAllProducts: async function (req, res) {
     const storeId = req.params.storeId;
     try {
       const data = await getProductByStore(storeId);
       if (data.length === 0) {
-        res.status(200).json([]);
+        res.status(200).json(data);
+        return;
       }
 
       for (let i = 0; i < data.length; i++) {
         const typeName = await getProductTypeById(data[i].type_id);
-        data[i].dataValues.type = typeName.name;
+        data[i].dataValues.type = typeName[0].name;
       }
 
       res.status(200).json(data);
@@ -103,6 +138,17 @@ module.exports = {
     const product_id = req.params.product_id;
     try {
       const data = await getProductById(product_id);
+      res.status(200).json(data);
+    } catch (err) {
+      console.log("err");
+      res.status(500).send(err);
+    }
+  },
+
+  getProductType: async function (req, res) {
+    const type_id = req.params.type_id;
+    try {
+      const data = await getProductTypeById(type_id);
       res.status(200).json(data);
     } catch (err) {
       console.log("err");

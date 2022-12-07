@@ -118,7 +118,7 @@ async function getAllProduct() {
 
 async function updateProductById(id, name, description, image, type_id, price) {
   try {
-    const data = await Menu.update(
+    await Menu.update(
       {
         name: name,
         description: description,
@@ -132,7 +132,7 @@ async function updateProductById(id, name, description, image, type_id, price) {
         },
       }
     );
-    return null;
+    return true;
   } catch (err) {
     console.error(err);
     return false;

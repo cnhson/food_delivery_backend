@@ -40,6 +40,28 @@ async function insertProductType(id, name, store_id) {
   }
 }
 
+async function editProductType(id, name) {
+  try {
+    await ProductType.update(
+      {
+        name: name,
+      },
+      {
+        where: {
+          id: {
+            [Op.eq]: id,
+          },
+        },
+      }
+    );
+
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
 async function getProductTypeByStoreId(store_id) {
   return await ProductType.findAll({
     attributes: ["id", "name"],
@@ -53,20 +75,40 @@ async function getProductTypeByStoreId(store_id) {
 
 async function getProductTypeById(id) {
   try {
-    const data = await ProductType.findAll({
+    return await ProductType.findAll({
+      attributes: ["name"],
       where: {
         id: id,
       },
     });
-    if (data.length > 0) {
-      return data[0];
-    } else {
-      return null;
-    }
   } catch (err) {
     console.log(err);
     return null;
   }
 }
 
-module.exports = { ProductType, getProductTypeById, insertProductType, getProductTypeByStoreId };
+async function getProductTypeByIdAndStoreId(type_id, store_id) {
+  return await ProductType.findAll({
+    where: {
+      [Op.and]: [
+        {
+          id: {
+            [Op.eq]: type_id,
+          },
+          store_id: {
+            [Op.eq]: store_id,
+          },
+        },
+      ],
+    },
+  });
+}
+
+module.exports = {
+  ProductType,
+  getProductTypeById,
+  insertProductType,
+  getProductTypeByStoreId,
+  getProductTypeByIdAndStoreId,
+  editProductType,
+};
