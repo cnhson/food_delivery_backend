@@ -81,13 +81,12 @@ async function getProductByStore(store_id) {
   });
 }
 
-async function getProductByName(name) {
+async function getProductById(id) {
   try {
     const data = await sequelize.query(
-      "select m.id, store_id, m.name, type_id, pt.name 'type_name', m.description, image, price, out_of_stock, del_flag from menu m " +
-        "inner join product_type pt on m.type_id = pt.id where m.name like '%" +
-        name +
-        "%'",
+      "select m.id, m.store_id, m.name, type_id, pt.name 'type_name', m.description, image, price, out_of_stock, del_flag from menu m " +
+        "inner join product_type pt on m.type_id = pt.id where m.id = " +
+        id,
       {
         type: QueryTypes.SELECT,
       }
@@ -117,7 +116,7 @@ async function getAllProduct() {
   }
 }
 
-async function updateProductById(id, store_id, name, description, image, price, out_of_stock, del_flag) {
+async function updateProductById(id, name, description, image, type_id, price) {
   try {
     const data = await Menu.update(
       {
@@ -126,22 +125,35 @@ async function updateProductById(id, store_id, name, description, image, price, 
         type_id: type_id,
         image: image,
         price: price,
-        out_of_stock: out_of_stock,
-        del_flag: del_flag,
       },
       {
         where: {
           id: id,
-          store_id: store_id,
         },
       }
     );
-    if (data.length > 0) return data;
-    else return null;
+    return null;
   } catch (err) {
     console.error(err);
-    return null;
+    return false;
   }
+}
+
+async function getProductByIdAndStoreId(id, store_id) {
+  return await Menu.findAll({
+    where: {
+      [Op.and]: [
+        {
+          id: {
+            [Op.eq]: id,
+          },
+          store_id: {
+            [Op.eq]: store_id,
+          },
+        },
+      ],
+    },
+  });
 }
 
 async function getProductDetail(id) {
@@ -185,9 +197,10 @@ async function getProductDetail(id) {
 module.exports = {
   Menu,
   getAllProduct,
-  getProductByName,
+  getProductById,
   addProduct,
   getProductDetail,
   getProductByStore,
   updateProductById,
+  getProductByIdAndStoreId,
 };

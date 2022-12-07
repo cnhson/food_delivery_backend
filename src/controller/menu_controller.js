@@ -1,7 +1,15 @@
-const { getAllProduct, getProductByName, addProduct, getProductDetail, updateProductById } = require("../models/menu");
+const {
+  getAllProduct,
+  getProductById,
+  addProduct,
+  getProductDetail,
+  updateProductById,
+  getProductByStore,
+  getProductByIdAndStoreId,
+} = require("../models/menu");
 
 const { getCommentsListFromStore } = require("../models/comment");
-const { insertProductType, getProductTypeByStoreId } = require("../models/product_type");
+const { insertProductType, getProductTypeByStoreId, getProductTypeById } = require("../models/product_type");
 const { getStoreById } = require("../models/store");
 
 module.exports = {
@@ -48,15 +56,21 @@ module.exports = {
       const type_id = req.body.type_id;
       const image = req.body.image;
       const price = req.body.price;
-      const out_of_stock = req.body.out_of_stock;
-      const del_flag = req.body.del_flag;
 
-      const result = await editProduct(id, store_id, name, description, type_id, image, price, out_of_stock, del_flag);
+      // check if store_id is own this product
+      const check = await getProductByIdAndStoreId(id, store_id);
+      if (check.length === 0) {
+        res.status(500).json({ error: "This product does not belong to the store" });
+        return;
+      }
+
+      // edit product
+      const result = await updateProductById(id, name, description, image, type_id, price);
       if (result) {
-        res.status(200).json("Edit product successfully");
+        res.status(200).json({ message: "Edit product successfully" });
         return;
       } else {
-        res.status(200).json("Fail to edit product");
+        res.status(200).json({ error: "Fail to edit product" });
         return;
       }
     } catch (err) {
@@ -65,38 +79,31 @@ module.exports = {
     }
   },
 
-  listAllProducts: async function (req, res) {
+  getAllProducts: async function (req, res) {
+    const storeId = req.params.storeId;
     try {
-      let productlist = await getAllProduct();
-      if (productlist === null) {
-        res.status(200).json({ error: "No products in the database" });
-        return;
-      } else {
-        res.status(200).json(productlist);
-        return;
+      const data = await getProductByStore(storeId);
+      if (data.length === 0) {
+        res.status(200).json([]);
       }
+
+      for (let i = 0; i < data.length; i++) {
+        const typeName = await getProductTypeById(data[i].type_id);
+        data[i].dataValues.type = typeName.name;
+      }
+
+      res.status(200).json(data);
     } catch (err) {
       console.log(err);
       res.status(500).send(err);
     }
   },
 
-  findProduct: async function (req, res) {
+  getProduct: async function (req, res) {
+    const product_id = req.params.product_id;
     try {
-      let productname = req.params.name;
-      if (productname === null) {
-        res.status(200).json({ error: "Please input a product name" });
-        return;
-      } else {
-        let result = await getProductByName(productname);
-        if (result != null) {
-          res.status(200).json(result);
-          return;
-        } else {
-          res.status(200).json("No product found");
-          return;
-        }
-      }
+      const data = await getProductById(product_id);
+      res.status(200).json(data);
     } catch (err) {
       console.log("err");
       res.status(500).send(err);
