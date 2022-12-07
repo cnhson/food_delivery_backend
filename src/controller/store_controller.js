@@ -4,7 +4,8 @@ const { pendingOrder, checkNewOrders } = require("../models/order");
 const { getProductByStore } = require("../models/menu");
 const { getAllType } = require("../models/store_type");
 module.exports = {
-  pending: async function (req, res) {
+  //Store owner use this func to change order status to "pending" - preparing stuff for order to be delivered
+  pendingStatusChange: async function (req, res) {
     try {
       const order_id = req.body.order_id;
       const account_id = req.body.account_id;
@@ -81,10 +82,10 @@ module.exports = {
 
   loadUserStore: async function (req, res) {
     try {
-      const owner_id = req.session.User.id;
+      const owner_id = req.body.owner_id;
       if (owner_id != null) {
         const storelist = await getUserStore(owner_id);
-
+        console.log(storelist);
         if (storelist) {
           res.status(200).json({ storelist });
         } else if (storelist == null) {
@@ -100,10 +101,10 @@ module.exports = {
     }
   },
 
-  editStore: async function (req, res, next) {
+  editStore: async function (req, res) {
     try {
       const id = req.body.id;
-      const owner_id = req.session.User.id;
+      const owner_id = req.owner_id;
       const name = req.body.name;
       const address = req.body.address;
       const description = req.body.description;

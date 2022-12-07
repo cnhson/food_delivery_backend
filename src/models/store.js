@@ -135,7 +135,6 @@ async function getStoreById(id) {
 async function getUserStore(owner_id) {
   try {
     return await Store.findAll({
-      attributes: [`id`, `owner_id`, `name`, `address`, `description`, `type_id`, `image`, `active_date`, `timestamp`],
       where: {
         owner_id: owner_id,
       },

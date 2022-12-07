@@ -60,7 +60,7 @@ module.exports = {
         return;
       }
       account = account[0];
-      //console.log(account[0].password);
+      console.log(account[0].password);
       const hashedPassword = account.password;
       bcrypt.compare(password, hashedPassword, async function (err, isMatch) {
         if (err) {

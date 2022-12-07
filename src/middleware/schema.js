@@ -159,6 +159,15 @@ const schemas = {
   storeId: Joi.object().keys({
     storeId: store_id,
   }),
+
+  getNewOrders: Joi.object().keys({
+    storeId: store_id,
+  }),
+
+  pendingStatusChange: Joi.object().keys({
+    order_id: order_id,
+    account_id: account_id,
+  }),
 };
 
 module.exports = schemas;

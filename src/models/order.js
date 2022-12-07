@@ -94,19 +94,43 @@ async function getOrderByAccount(account_id, order_id) {
   });
 }
 
-async function getUserOrderList(account_id, status) {
+async function getUserOrderWithCommentList(account_id, status) {
   try {
     const data = await sequelize.query(
-      "select o.id, account_id, product_id,quantity,price, ship_fee, o.timestamp, payment_method, status from food_delivery.order o " +
-        "inner join order_detail od on o.id = od.order_id where account_id = " +
+      "select o.id, o.account_id, product_id, quantity, price, ship_fee, o.timestamp, payment_method, status, " +
+        "c.id 'commentid', c.comment 'comment', c.star 'star', c.timestamp 'ctimestamp', c.updated 'cupdated' " +
+        "from food_delivery.order o inner join order_detail od on o.id = od.order_id " +
+        "left join comment c on o.id = c.order_id " +
+        "where o.account_id = '" +
         account_id +
-        " and status like '%" +
+        "' and status like '%" +
         status +
         "%'",
       {
         type: QueryTypes.SELECT,
       }
     );
+
+    for (let item in data) {
+      var c = {
+        commentid: data[item].commentid,
+        comment: data[item].comment,
+        star: data[item].star,
+        ctimestamp: data[item].ctimestamp,
+        cupdated: data[item].cupdated,
+      };
+
+      if (data[item].commentid != null) {
+        data[item]["c"] = c;
+      }
+
+      delete data[item].commentid;
+      delete data[item].comment;
+      delete data[item].star;
+      delete data[item].ctimestamp;
+      delete data[item].cupdated;
+    }
+
     return data;
   } catch (err) {
     console.log(err);
@@ -212,7 +236,7 @@ module.exports = {
   Order,
   insertOrder,
   getOrderByAccount,
-  getUserOrderList,
+  getUserOrderWithCommentList,
   checkNewOrders,
   pendingOrder,
   receiveOrder,

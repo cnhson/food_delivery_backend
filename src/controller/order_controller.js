@@ -1,15 +1,21 @@
-const { insertOrder, getUserOrderList, calculateTotalPerDayWithLimit, receiveOrder } = require("../models/order");
+const {
+  insertOrder,
+  getUserOrderWithCommentList,
+  calculateTotalPerDayWithLimit,
+  receiveOrder,
+} = require("../models/order");
 const { insertOrderDetail } = require("../models/order_detail");
 const crypto = require("crypto");
 
 module.exports = {
-  receive: async function (req, res) {
+  //If customer has received then use this func to change status to "received"
+  receiveStatusChange: async function (req, res) {
     try {
       const order_id = req.body.order_id;
-      const account_id = req.session.User.id;
+      const account_id = req.body.account_id;
 
       const receive_res = await receiveOrder(order_id, account_id);
-      if (receive_res) res.status(200).json({ message: "Order received!!" });
+      if (receive_res) res.status(200).json({ message: "Status change to received!!" });
     } catch (err) {
       res.status(500).send(err);
     }
@@ -22,8 +28,8 @@ module.exports = {
       const store_id = req.body.store_id;
 
       //How many prev days limited by number
-      const limit = req.body.limit;
 
+      const limit = req.body.limit;
       const data = await calculateTotalPerDayWithLimit(store_id, limit);
 
       //Change to array[[timestamp,total]]
@@ -74,17 +80,17 @@ module.exports = {
 
   orderHistory: async function (req, res) {
     try {
-      const account_id = req.session.User.id;
+      const account_id = req.body.account_id;
       let status = "";
 
       if (req.params.status != "any") {
         status = req.params.status;
       }
-      console.log("test [" + status + "]");
-      const result = await getUserOrderList(account_id, status);
 
-      if (result.length != 0) {
-        res.status(200).json(result);
+      const orderlist = await getUserOrderWithCommentList(account_id, status);
+
+      if (orderlist.length != 0) {
+        res.status(200).json(orderlist);
       } else {
         res.status(200).json({ message: "Error " });
       }
@@ -93,6 +99,7 @@ module.exports = {
     }
   },
 
+  // Test output random ids
   test: async function (req, res) {
     const rid1 = crypto.randomBytes(3).toString("hex");
     const rid2 = crypto.randomBytes(5).toString("hex");
