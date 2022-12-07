@@ -13,8 +13,14 @@ router
 router.route("/new-product/").post(middleware(schemas.createProduct, PROPERTY_TYPE.body), menu.createProduct);
 router.route("/edit-product/").post(middleware(schemas.editProduct, PROPERTY_TYPE.body), menu.editProduct);
 
+// product type
 router
   .route("/new-product-type/")
   .post(middleware(schemas.createProductType, PROPERTY_TYPE.body), menu.createProductType);
+
+router.route("/get-product-type/:type_id").get(middleware(schemas.type_id, PROPERTY_TYPE.params), menu.getProductType);
+router
+  .route("/edit-product-type/")
+  .post(middleware(schemas.editProductType, PROPERTY_TYPE.body), menu.updateProductType);
 
 module.exports = router;
