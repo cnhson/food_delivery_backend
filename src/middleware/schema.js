@@ -21,12 +21,14 @@ const comment_id = Joi.number().min(0).required();
 
 const password = Joi.string().pattern(new RegExp("^[a-zA-Z0-9!@#$%^&*()+-/]{8,100}$")).required();
 const product_id = Joi.number().min(0).required();
-const account_id = Joi.number().min(0).required();
+const product_array = Joi.array().min(0).required();
+const account_id = Joi.string().length(10).required();
 
 const product_type_id = Joi.string().length(10).required();
 const store_id = Joi.string().length(10).required();
+const status_id = Joi.string().required();
 
-const order_id = Joi.string().pattern(new RegExp("^[a-zA-Z]{1,25}$")).required();
+const order_id = Joi.string().length(10).required();
 const comment = Joi.string().pattern(new RegExp("^[a-zA-Z]{3,2000}$")).required();
 
 const image = Joi.string().alphanum().required();
@@ -106,9 +108,15 @@ const schemas = {
   }),
 
   createOrder: Joi.object().keys({
+    order_id: order_id,
+    account_id: account_id,
     store_id: store_id,
-    product_id: product_id,
-    quantity: quantity,
+    order_detail: Joi.array().items(
+      Joi.object().keys({
+        product_id: product_id,
+        quantity: quantity,
+      })
+    ),
     payment_method: payment_method,
     ship_fee: ship_fee,
     price: price,

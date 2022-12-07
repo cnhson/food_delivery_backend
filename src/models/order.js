@@ -55,10 +55,10 @@ const Order = sequelize.define(
   }
 );
 
-async function insertOrder(id, store_id, account_id, price, ship_fee, payment_method, timestamp) {
+async function insertOrder(order_id, store_id, account_id, price, ship_fee, payment_method, timestamp) {
   try {
     await Order.create({
-      id: id,
+      id: order_id,
       store_id: store_id,
       account_id: account_id,
       price: price,

@@ -40,34 +40,35 @@ module.exports = {
 
   createOrder: async function (req, res) {
     try {
-      if (req.session.User.id === null) {
-        res.status(500).send("Please login!");
-      } else {
-        const account_id = req.session.User.id;
-        const store_id = req.body.store_id;
-        const product_id = req.body.product_id;
-        // create random order id - length(6)
-        const rid = crypto.randomBytes(3).toString("hex");
-        const oid = "O" + rid;
-        // Create order's id
-        const quantity = req.body.quantity;
-        const payment_method = req.body.payment_method;
-        const ship_fee = req.body.ship_fee;
-        const price = req.body.price;
-        const timestamp = req.body.timestamp;
-        console.log("ramdon id: " + oid);
-        const result1 = insertOrder(oid, store_id, account_id, price, ship_fee, payment_method, timestamp);
+      const order_id = req.body.order_id;
+      const account_id = req.body.id;
+      const store_id = req.body.store_id;
+      const order_detail = res.body.store_id;
+      const payment_method = req.body.payment_method;
+      const ship_fee = req.body.ship_fee;
+      const price = req.body.price;
+      const timestamp = req.body.timestamp;
 
-        const result2 = insertOrderDetail(oid, product_id, quantity);
+      // insert order into db
+      const result1 = await insertOrder(order_id, store_id, account_id, price, ship_fee, payment_method, timestamp);
+      if (!result1) {
+        res.status(500).json({ error: "Create order failed!" });
+        return;
+      }
 
-        const result = await Promise.all([result1, result2]);
-
-        if (result) {
-          res.status(200).json({ message: "Create order successfully" });
+      // insert order detail to db
+      for (let i = 0; i < order_detail.length; i++) {
+        const { product_id, quantity } = order_detail[i];
+        const result2 = await insertOrderDetail(order_id, product_id, quantity);
+        if (!result2) {
+          res.status(500).json({ error: "Create order detail failed!" });
+          return;
         }
       }
+
+      res.status(200).json({ message: "Create order successfully" });
     } catch (err) {
-      res.status(500).send("Opsi");
+      res.status(500).send(err);
     }
   },
 
