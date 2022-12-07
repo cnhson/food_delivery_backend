@@ -97,14 +97,13 @@ const schemas = {
   }),
 
   editProduct: Joi.object().keys({
+    id: product_id,
     store_id: store_id,
     name: name,
     description: description,
     type_id: type_id,
     image: image,
     price: price,
-    out_of_stock: out_of_stock,
-    del_flag: del_flag,
   }),
 
   createOrder: Joi.object().keys({

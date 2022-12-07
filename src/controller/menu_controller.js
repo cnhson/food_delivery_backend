@@ -5,6 +5,7 @@ const {
   getProductDetail,
   updateProductById,
   getProductByStore,
+  getProductByIdAndStoreId,
 } = require("../models/menu");
 
 const { getCommentsListFromStore } = require("../models/comment");
@@ -55,15 +56,21 @@ module.exports = {
       const type_id = req.body.type_id;
       const image = req.body.image;
       const price = req.body.price;
-      const out_of_stock = req.body.out_of_stock;
-      const del_flag = req.body.del_flag;
 
-      const result = await editProduct(id, store_id, name, description, type_id, image, price, out_of_stock, del_flag);
+      // check if store_id is own this product
+      const check = await getProductByIdAndStoreId(id, store_id);
+      if (check.length === 0) {
+        res.status(500).json({ error: "This product does not belong to the store" });
+        return;
+      }
+
+      // edit product
+      const result = await updateProductById(id, name, description, image, type_id, price);
       if (result) {
-        res.status(200).json("Edit product successfully");
+        res.status(200).json({ message: "Edit product successfully" });
         return;
       } else {
-        res.status(200).json("Fail to edit product");
+        res.status(200).json({ error: "Fail to edit product" });
         return;
       }
     } catch (err) {

@@ -116,7 +116,7 @@ async function getAllProduct() {
   }
 }
 
-async function updateProductById(id, store_id, name, description, image, price, out_of_stock, del_flag) {
+async function updateProductById(id, name, description, image, type_id, price) {
   try {
     const data = await Menu.update(
       {
@@ -125,22 +125,35 @@ async function updateProductById(id, store_id, name, description, image, price, 
         type_id: type_id,
         image: image,
         price: price,
-        out_of_stock: out_of_stock,
-        del_flag: del_flag,
       },
       {
         where: {
           id: id,
-          store_id: store_id,
         },
       }
     );
-    if (data.length > 0) return data;
-    else return null;
+    return null;
   } catch (err) {
     console.error(err);
-    return null;
+    return false;
   }
+}
+
+async function getProductByIdAndStoreId(id, store_id) {
+  return await Menu.findAll({
+    where: {
+      [Op.and]: [
+        {
+          id: {
+            [Op.eq]: id,
+          },
+          store_id: {
+            [Op.eq]: store_id,
+          },
+        },
+      ],
+    },
+  });
 }
 
 async function getProductDetail(id) {
@@ -189,4 +202,5 @@ module.exports = {
   getProductDetail,
   getProductByStore,
   updateProductById,
+  getProductByIdAndStoreId,
 };
