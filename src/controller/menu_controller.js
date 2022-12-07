@@ -1,7 +1,14 @@
-const { getAllProduct, getProductByName, addProduct, getProductDetail, updateProductById } = require("../models/menu");
+const {
+  getAllProduct,
+  getProductById,
+  addProduct,
+  getProductDetail,
+  updateProductById,
+  getProductByStore,
+} = require("../models/menu");
 
 const { getCommentsListFromStore } = require("../models/comment");
-const { insertProductType, getProductTypeByStoreId } = require("../models/product_type");
+const { insertProductType, getProductTypeByStoreId, getProductTypeById } = require("../models/product_type");
 const { getStoreById } = require("../models/store");
 
 module.exports = {
@@ -65,38 +72,31 @@ module.exports = {
     }
   },
 
-  listAllProducts: async function (req, res) {
+  getAllProducts: async function (req, res) {
+    const storeId = req.params.storeId;
     try {
-      let productlist = await getAllProduct();
-      if (productlist === null) {
-        res.status(200).json({ error: "No products in the database" });
-        return;
-      } else {
-        res.status(200).json(productlist);
-        return;
+      const data = await getProductByStore(storeId);
+      if (data.length === 0) {
+        res.status(200).json([]);
       }
+
+      for (let i = 0; i < data.length; i++) {
+        const typeName = await getProductTypeById(data[i].type_id);
+        data[i].dataValues.type = typeName.name;
+      }
+
+      res.status(200).json(data);
     } catch (err) {
       console.log(err);
       res.status(500).send(err);
     }
   },
 
-  findProduct: async function (req, res) {
+  getProduct: async function (req, res) {
+    const product_id = req.params.product_id;
     try {
-      let productname = req.params.name;
-      if (productname === null) {
-        res.status(200).json({ error: "Please input a product name" });
-        return;
-      } else {
-        let result = await getProductByName(productname);
-        if (result != null) {
-          res.status(200).json(result);
-          return;
-        } else {
-          res.status(200).json("No product found");
-          return;
-        }
-      }
+      const data = await getProductById(product_id);
+      res.status(200).json(data);
     } catch (err) {
       console.log("err");
       res.status(500).send(err);

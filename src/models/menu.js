@@ -81,13 +81,12 @@ async function getProductByStore(store_id) {
   });
 }
 
-async function getProductByName(name) {
+async function getProductById(id) {
   try {
     const data = await sequelize.query(
-      "select m.id, store_id, m.name, type_id, pt.name 'type_name', m.description, image, price, out_of_stock, del_flag from menu m " +
-        "inner join product_type pt on m.type_id = pt.id where m.name like '%" +
-        name +
-        "%'",
+      "select m.id, m.store_id, m.name, type_id, pt.name 'type_name', m.description, image, price, out_of_stock, del_flag from menu m " +
+        "inner join product_type pt on m.type_id = pt.id where m.id = " +
+        id,
       {
         type: QueryTypes.SELECT,
       }
@@ -185,7 +184,7 @@ async function getProductDetail(id) {
 module.exports = {
   Menu,
   getAllProduct,
-  getProductByName,
+  getProductById,
   addProduct,
   getProductDetail,
   getProductByStore,
