@@ -2,9 +2,10 @@ const {
   insertOrder,
   getUserOrderWithCommentList,
   calculateTotalPerDayWithLimit,
-  receiveOrder,
+  updateStatus,
   getTotalOrdersByStatus,
   getRangeOrdersByStatus,
+  getOrderByAccount,
 } = require("../models/order");
 const { insertOrderDetail } = require("../models/order_detail");
 const crypto = require("crypto");
@@ -13,15 +14,41 @@ const { pagination, checkNextAndPreviousPage } = require("../services/common");
 const { getStatusById } = require("../models/status");
 
 module.exports = {
-  //If customer has received then use this func to change status to "received"
-  receiveStatusChange: async function (req, res) {
+  updateStatus: async function (req, res) {
     try {
       const order_id = req.body.order_id;
       const account_id = req.body.account_id;
+      const status_id = req.body.status_id;
+      console.log(status_id);
 
-      const receive_res = await receiveOrder(order_id, account_id);
-      if (receive_res) res.status(200).json({ message: "Status change to received!!" });
+      // check if account is seller or account is customer who own this order
+      const check = await getAccountByIdAndRole(account_id, "SEL");
+      const checkCus = await getOrderByAccount(account_id, order_id);
+      if (check.length === 0 && checkCus.length === 0) {
+        res.status(500).json({ error: "You do not have permission to update the status of this order" });
+        return;
+      } else {
+        // check if this order is accepted or not
+        if (checkCus.length > 0) {
+          const status = checkCus[0].status;
+          if (status !== "NRY") {
+            res
+              .status(500)
+              .json({ error: "This order cannot be canceled because the store owner has already accepted it" });
+            return;
+          }
+        }
+
+        const result = await updateStatus(order_id, status_id);
+        if (result) {
+          res.status(200).json({ message: "Update status successfully!" });
+          return;
+        }
+        res.status(500).json({ error: "Update status failed or this order does not exists" });
+        return;
+      }
     } catch (err) {
+      console.log(err);
       res.status(500).send(err);
     }
   },
@@ -58,6 +85,7 @@ module.exports = {
       const payment_method = req.body.payment_method;
       const ship_fee = req.body.ship_fee;
       const price = req.body.price;
+      const address = req.body.address;
       const timestamp = req.body.timestamp;
 
       //check if account exists
@@ -68,10 +96,17 @@ module.exports = {
         return;
       }
 
-      console.log(order_detail);
-
       // insert order into db
-      const result1 = await insertOrder(order_id, store_id, account_id, price, ship_fee, payment_method, timestamp);
+      const result1 = await insertOrder(
+        order_id,
+        store_id,
+        account_id,
+        price,
+        address,
+        ship_fee,
+        payment_method,
+        timestamp
+      );
       if (!result1) {
         res.status(500).json({ error: "Create order failed!" });
         return;
@@ -144,11 +179,11 @@ module.exports = {
 
       // get email by account id and status by status id
       for (let i = 0; i < items.length; i++) {
-        const email = await getAccountByIdAndRole(items[0].account_id, "CUS");
-        delete items[0].dataValues.account_id;
-        items[0].dataValues.email = email[0].email;
-        const status = await getStatusById(items[0].status);
-        items[0].dataValues.status = status[0].name;
+        const email = await getAccountByIdAndRole(items[i].account_id, "CUS");
+        delete items[i].dataValues.account_id;
+        items[i].dataValues.email = email[0].email;
+        const status = await getStatusById(items[i].status);
+        items[i].dataValues.status = status[0].name;
       }
       data.items = items;
 

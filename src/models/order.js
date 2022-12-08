@@ -29,6 +29,10 @@ const Order = sequelize.define(
       type: DataTypes.STRING(50),
       allowNull: false,
     },
+    address: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+    },
     ship_fee: {
       type: DataTypes.STRING(50),
       allowNull: false,
@@ -55,13 +59,14 @@ const Order = sequelize.define(
   }
 );
 
-async function insertOrder(order_id, store_id, account_id, price, ship_fee, payment_method, timestamp) {
+async function insertOrder(order_id, store_id, account_id, price, address, ship_fee, payment_method, timestamp) {
   try {
     await Order.create({
       id: order_id,
       store_id: store_id,
       account_id: account_id,
       price: price,
+      address: address,
       ship_fee: ship_fee,
       payment_method: payment_method,
       status: "NRY",
@@ -76,7 +81,7 @@ async function insertOrder(order_id, store_id, account_id, price, ship_fee, paym
 }
 
 async function getOrderByAccount(account_id, order_id) {
-  return await Comment.findAll({
+  return await Order.findAll({
     where: {
       [Op.and]: [
         {
@@ -198,15 +203,20 @@ async function pendingOrder(id, account_id) {
   }
 }
 
-async function receiveOrder(id, account_id) {
+async function updateStatus(id, status_id) {
   try {
-    await Order.update({
-      status: "received",
-      where: {
-        id: id,
-        account_id: account_id,
+    await Order.update(
+      {
+        status: status_id,
       },
-    });
+      {
+        where: {
+          id: {
+            [Op.eq]: id,
+          },
+        },
+      }
+    );
 
     return true;
   } catch (err) {
@@ -282,7 +292,7 @@ module.exports = {
   getUserOrderWithCommentList,
   checkNewOrders,
   pendingOrder,
-  receiveOrder,
+  updateStatus,
   calculateTotalPerDayWithLimit,
   getTotalOrdersByStatus,
   getRangeOrdersByStatus,

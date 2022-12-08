@@ -8,7 +8,13 @@ router.get("/history/:status", order.orderHistory);
 
 router.route("/create").post(middleware(schemas.createOrder, PROPERTY_TYPE.body), order.createOrder);
 router.route("/profit").get(middleware(schemas.profitPerDay, PROPERTY_TYPE.body), order.profitPerDate);
-router.route("/status-change/receive").post(middleware(schemas.receive, PROPERTY_TYPE.body), order.receiveStatusChange);
+
+/*
+    api used to update status of order if store owner call this api
+    or customer who own this order want to cancel order before store 
+    owner accept order
+*/
+router.route("/status-change").post(middleware(schemas.updateOrder, PROPERTY_TYPE.body), order.updateStatus);
 router.route("/get-store-orders").get(middleware(schemas.getStoreOrders, PROPERTY_TYPE.query), order.getStoreOrders);
 
 //test

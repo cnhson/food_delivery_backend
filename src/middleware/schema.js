@@ -125,6 +125,7 @@ const schemas = {
         quantity: quantity,
       })
     ),
+    address: address,
     payment_method: payment_method,
     ship_fee: ship_fee,
     price: price,
@@ -136,9 +137,10 @@ const schemas = {
     limit: Joi.number().required(),
   }),
 
-  receive: Joi.object().keys({
+  updateOrder: Joi.object().keys({
     order_id: order_id,
     account_id: account_id,
+    status_id: status_id,
   }),
 
   createStore: Joi.object().keys({
