@@ -21,17 +21,17 @@ const Role = sequelize.define(
 
 async function insertDefaultRole() {
   try {
-    await Role.create({
+    await Role.upsert({
       id: "AD",
       name: "admin",
     });
 
-    await Role.create({
+    await Role.upsert({
       id: "CUS",
       name: "customer",
     });
 
-    await Role.create({
+    await Role.upsert({
       id: "SEL",
       name: "seller",
     });

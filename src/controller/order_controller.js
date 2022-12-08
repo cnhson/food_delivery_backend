@@ -3,9 +3,14 @@ const {
   getUserOrderWithCommentList,
   calculateTotalPerDayWithLimit,
   receiveOrder,
+  getTotalOrdersByStatus,
+  getRangeOrdersByStatus,
 } = require("../models/order");
 const { insertOrderDetail } = require("../models/order_detail");
 const crypto = require("crypto");
+const { getAccountByIdAndRole } = require("../models/account");
+const { pagination, checkNextAndPreviousPage } = require("../services/common");
+const { getStatusById } = require("../models/status");
 
 module.exports = {
   //If customer has received then use this func to change status to "received"
@@ -47,13 +52,23 @@ module.exports = {
   createOrder: async function (req, res) {
     try {
       const order_id = req.body.order_id;
-      const account_id = req.body.id;
+      const account_id = req.body.account_id;
       const store_id = req.body.store_id;
-      const order_detail = res.body.store_id;
+      const order_detail = req.body.order_detail;
       const payment_method = req.body.payment_method;
       const ship_fee = req.body.ship_fee;
       const price = req.body.price;
       const timestamp = req.body.timestamp;
+
+      //check if account exists
+      const check = await getAccountByIdAndRole(account_id, "CUS");
+
+      if (check.length === 0) {
+        res.status(500).json({ error: "Account does not exists" });
+        return;
+      }
+
+      console.log(order_detail);
 
       // insert order into db
       const result1 = await insertOrder(order_id, store_id, account_id, price, ship_fee, payment_method, timestamp);
@@ -96,6 +111,50 @@ module.exports = {
       }
     } catch (err) {
       res.status(500).send(err);
+    }
+  },
+
+  getStoreOrders: async function (req, res) {
+    const store_id = req.query.store_id;
+    const status_id = req.query.status_id;
+    const page = Number(req.query.page);
+    const size = Number(req.query.size);
+
+    try {
+      const data = pagination;
+      data.currentPage = page;
+      data.size = size;
+
+      // get total orders by status
+      const totalOrders = await getTotalOrdersByStatus(store_id, status_id);
+      data.total = totalOrders;
+
+      // get total pages
+      const totalPages = Math.ceil(totalOrders / size);
+      data.pages = totalPages == 0 ? 1 : totalPages;
+
+      // check if current page has next page and previous page
+      const check = checkNextAndPreviousPage(page, totalPages);
+      data.hasNext = check.hasNext;
+      data.hasPrevious = check.hasPrevious;
+
+      // get items
+      const start = Number(size * (page - 1));
+      const items = await getRangeOrdersByStatus(start, size, store_id, status_id);
+
+      // get email by account id and status by status id
+      for (let i = 0; i < items.length; i++) {
+        const email = await getAccountByIdAndRole(items[0].account_id, "CUS");
+        delete items[0].dataValues.account_id;
+        items[0].dataValues.email = email[0].email;
+        const status = await getStatusById(items[0].status);
+        items[0].dataValues.status = status[0].name;
+      }
+      data.items = items;
+
+      res.status(200).json(data);
+    } catch (err) {
+      res.status(500).json(err);
     }
   },
 

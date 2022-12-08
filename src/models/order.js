@@ -1,5 +1,5 @@
 const { sequelize } = require("../services/common");
-const { DataTypes, Op, QueryTypes } = require("sequelize");
+const { DataTypes, Op, QueryTypes, Sequelize } = require("sequelize");
 const { orderDetail } = require("./order_detail");
 
 const Order = sequelize.define(
@@ -64,7 +64,7 @@ async function insertOrder(order_id, store_id, account_id, price, ship_fee, paym
       price: price,
       ship_fee: ship_fee,
       payment_method: payment_method,
-      status: "noticed",
+      status: "NRY",
       timestamp: timestamp,
     });
 
@@ -91,6 +91,49 @@ async function getOrderByAccount(account_id, order_id) {
         },
       ],
     },
+  });
+}
+
+async function getTotalOrdersByStatus(store_id, status_id) {
+  const total = await Order.findAll({
+    attributes: [[Sequelize.fn("COUNT", Sequelize.col("*")), "total_orders"]],
+    where: {
+      [Op.and]: [
+        {
+          status: {
+            [Op.eq]: status_id,
+          },
+        },
+        {
+          store_id: {
+            [Op.eq]: store_id,
+          },
+        },
+      ],
+    },
+  });
+  return total[0].dataValues.total_orders;
+}
+
+async function getRangeOrdersByStatus(start, size, store_id, status_id) {
+  return await Order.findAll({
+    where: {
+      [Op.and]: [
+        {
+          status: {
+            [Op.eq]: status_id,
+          },
+        },
+        {
+          store_id: {
+            [Op.eq]: store_id,
+          },
+        },
+      ],
+    },
+    order: [["timestamp", "DESC"]],
+    offset: start,
+    limit: size,
   });
 }
 
@@ -241,4 +284,6 @@ module.exports = {
   pendingOrder,
   receiveOrder,
   calculateTotalPerDayWithLimit,
+  getTotalOrdersByStatus,
+  getRangeOrdersByStatus,
 };
