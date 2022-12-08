@@ -151,8 +151,7 @@ const schemas = {
     address: address,
     description: description,
     image: image,
-    type_id: type_id,
-    store_type: store_type,
+    type_id: store_type,
     timestamp: timestamp,
   }),
 
