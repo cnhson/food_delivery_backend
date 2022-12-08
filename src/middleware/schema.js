@@ -47,6 +47,9 @@ const del_flag = Joi.number().valid(0, 1).required();
 const date1 = Joi.date().raw();
 const date2 = Joi.date().raw();
 
+const page = Joi.number().min(1).required();
+const size = Joi.number().valid(20, 50, 100).required();
+
 ////  Schemas zone //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const schemas = {
   registerAccount: Joi.object().keys({
@@ -179,6 +182,12 @@ const schemas = {
   }),
   type_id: Joi.object().keys({
     type_id: type_id,
+  }),
+  getStoreOrders: Joi.object().keys({
+    store_id: store_id,
+    status_id: status_id,
+    page: page,
+    size: size,
   }),
 };
 

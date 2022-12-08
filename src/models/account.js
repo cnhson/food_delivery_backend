@@ -100,4 +100,24 @@ async function getAccountById(userId) {
   });
 }
 
-module.exports = { Account, insertAccount, getAccountByEmailAndRole, getAccountById };
+async function getAccountByIdAndRole(userId, role_id) {
+  return await Account.findAll({
+    attributes: ["email", "name"],
+    where: {
+      [Op.and]: [
+        {
+          id: {
+            [Op.eq]: userId,
+          },
+        },
+        {
+          role_id: {
+            [Op.eq]: role_id,
+          },
+        },
+      ],
+    },
+  });
+}
+
+module.exports = { Account, insertAccount, getAccountByEmailAndRole, getAccountById, getAccountByIdAndRole };

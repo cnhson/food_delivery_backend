@@ -7,7 +7,7 @@ const { Store } = require("../models/store");
 const { Order } = require("../models/order");
 const { Comment } = require("../models/comment");
 const { orderDetail } = require("../models/order_detail");
-const { Status } = require("../models/status");
+const { Status, insertDefaultStatus } = require("../models/status");
 const { sequelize } = require("../services/common");
 
 module.exports = {
@@ -15,6 +15,7 @@ module.exports = {
     try {
       await sequelize.sync();
       await insertDefaultRole();
+      await insertDefaultStatus();
       res.status(200).json("Create all table successfully");
     } catch (err) {
       console.log(err);
