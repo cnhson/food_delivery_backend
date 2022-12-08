@@ -4,22 +4,6 @@ const { pendingOrder, checkNewOrders } = require("../models/order");
 const { getProductByStore } = require("../models/menu");
 const { getAllType } = require("../models/store_type");
 module.exports = {
-  //Store owner use this func to change order status to "pending" - preparing stuff for order to be delivered
-  pendingStatusChange: async function (req, res) {
-    try {
-      const order_id = req.body.order_id;
-      const account_id = req.body.account_id;
-
-      const pending_res = await pendingOrder(order_id, account_id);
-
-      if (pending_res) {
-        res.status(200).json({ message: "Changed to pending!!" });
-      }
-    } catch (err) {
-      res.status(500).send(err);
-    }
-  },
-
   getNewOrders: async function (req, res) {
     try {
       const store_id = req.body.store_id;

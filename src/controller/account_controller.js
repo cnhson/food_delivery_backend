@@ -9,7 +9,7 @@ module.exports = {
       await req.session.destroy();
       res.status(200).json("Logout successfully!");
     } catch (error) {
-      res.status(500).json("Logout Failed!");
+      res.status(404).json("Logout Failed!");
     }
   },
 
@@ -38,12 +38,12 @@ module.exports = {
           if (result) {
             res.status(200).json({ message: "Register successfully" });
           } else {
-            res.status(500).json({ error: "This email is already exists" });
+            res.status(404).json({ error: "This email is already exists" });
           }
         });
       });
     } catch (err) {
-      res.status(500).send("Error");
+      res.status(404).send("Error");
     }
   },
 
@@ -60,26 +60,42 @@ module.exports = {
         return;
       }
       account = account[0];
-      console.log(account.password);
+      //console.log(account.password);
       const hashedPassword = account.password;
       bcrypt.compare(password, hashedPassword, async function (err, isMatch) {
         if (err) {
-          res.status(200).json({ error: err });
+          res.status(404).json({ error: err });
           return;
         }
 
         if (!isMatch) {
-          res.status(200).json({ error: "Password is incorrect" });
+          res.status(404).json({ error: "Password is incorrect" });
           return;
         }
-        // get store id
-        const store = await getUserStore(account.id);
-
-        res.status(200).json({ message: "Login successfully!", userId: account.id, storeId: store[0].id });
+        //check user's role to return data
+        if (account.rold_id === "CUS") {
+          res.status(200).json({
+            message: "Login successfully!",
+            userId: account.id,
+            name: account.name,
+            email: account.email,
+            role: account.role_id,
+          });
+        } else {
+          const store = await getUserStore(account.id);
+          res.status(200).json({
+            message: "Login successfully!",
+            userId: account.id,
+            name: account.name,
+            email: account.email,
+            role: account.role_id,
+            storeId: store[0].id,
+          });
+        }
       });
     } catch (err) {
       console.log(err);
-      res.status(500).send(err);
+      res.status(404).send(err);
     }
   },
 
@@ -90,7 +106,7 @@ module.exports = {
       const data = await getAccountById(userId);
       res.status(200).json(data[0]);
     } catch (err) {
-      res.status(500).json({ error: err });
+      res.status(404).json({ error: err });
     }
   },
 };
