@@ -73,7 +73,7 @@ module.exports = {
           return;
         }
         //check user's role to return data
-        if (account.rold_id === "CUS") {
+        if (account.role_id === "CUS") {
           res.status(200).json({
             message: "Login successfully!",
             userId: account.id,
@@ -83,13 +83,20 @@ module.exports = {
           });
         } else {
           const store = await getUserStore(account.id);
+          console.log(store);
+          if (store.length === 0) {
+            //owner not yet created store
+            sid = 0;
+          } else {
+            sid = store[0].id;
+          }
           res.status(200).json({
             message: "Login successfully!",
             userId: account.id,
             name: account.name,
             email: account.email,
             role: account.role_id,
-            storeId: store[0].id,
+            storeId: sid,
           });
         }
       });
