@@ -6,6 +6,7 @@ const {
   updateProductById,
   getProductByStore,
   getProductByIdAndStoreId,
+  getMostOrderedProductsDesc,
 } = require("../models/menu");
 
 const { getCommentsListFromStore } = require("../models/comment");
@@ -107,6 +108,18 @@ module.exports = {
         res.status(200).json({ error: "Fail to edit product" });
         return;
       }
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+  },
+
+  //Uu tien product duoc order nhieu nhat len tren
+  getPopularProductsDesc: async function (req, res) {
+    try {
+      const data = await getMostOrderedProductsDesc();
+
+      res.status(200).json(data);
     } catch (err) {
       console.log(err);
       res.status(500).send(err);

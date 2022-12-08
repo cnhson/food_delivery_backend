@@ -156,6 +156,23 @@ async function getProductByIdAndStoreId(id, store_id) {
   });
 }
 
+async function getMostOrderedProductsDesc() {
+  try {
+    const data = await sequelize.query(
+      "SELECT count(product_id) 'ordered_num', m.id, store_id, name, description, type_id, image, price FROM food_delivery.order_detail od" +
+        " right join menu m on od.product_id = m.id group by product_id order by ordered_num desc ",
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    return data;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
+
 async function getProductDetail(id) {
   try {
     //Filter product info
@@ -203,4 +220,5 @@ module.exports = {
   getProductByStore,
   updateProductById,
   getProductByIdAndStoreId,
+  getMostOrderedProductsDesc,
 };
