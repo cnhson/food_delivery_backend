@@ -9,7 +9,6 @@ const {
   getMostOrderedProductsDesc,
 } = require("../models/menu");
 
-const { getCommentsListFromStore } = require("../models/comment");
 const {
   insertProductType,
   getProductTypeByStoreId,
@@ -118,7 +117,6 @@ module.exports = {
   getPopularProductsDesc: async function (req, res) {
     try {
       const data = await getMostOrderedProductsDesc();
-
       res.status(200).json(data);
     } catch (err) {
       console.log(err);
@@ -178,9 +176,7 @@ module.exports = {
       } else {
         let product = await getProductDetail(productid);
         if (product != null) {
-          let feedback = await getCommentsListFromStore(product.store.sid);
-          const feedbackcount = feedback.length;
-          res.status(200).json({ product, feedbackcount, feedback });
+          res.status(200).json(product);
           return;
         } else {
           res.status(200).json("Product not found");
