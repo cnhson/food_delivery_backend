@@ -171,7 +171,7 @@ module.exports = {
 
   productInfo: async function (req, res) {
     try {
-      let productid = req.params.pid;
+      let productid = req.params.id;
       if (productid === null) {
         res.status(200).json({ error: "Please input a product id" });
         return;
