@@ -7,6 +7,8 @@ const {
   getRangeOrdersByStatus,
   getOrderByAccount,
   getOrderById,
+  getTotalOrdersByStatusOfUser,
+  getRangeOrdersByStatusOfUser,
 } = require("../models/order");
 const { insertOrderDetail, getOrderDetailById } = require("../models/order_detail");
 const crypto = require("crypto");
@@ -15,6 +17,7 @@ const { pagination, checkNextAndPreviousPage } = require("../services/common");
 const { getStatusById } = require("../models/status");
 const { getProductTypeById } = require("../models/product_type");
 const { getProductById } = require("../models/menu");
+const { getStoreById } = require("../models/store");
 
 module.exports = {
   updateStatus: async function (req, res) {
@@ -131,22 +134,44 @@ module.exports = {
     }
   },
 
-  orderHistory: async function (req, res) {
+  getHistory: async function (req, res) {
+    const user_id = req.query.user_id;
+    const status_id = req.query.status_id;
+    const page = Number(req.query.page);
+    const size = Number(req.query.size);
     try {
-      const account_id = req.body.account_id;
-      let status = "";
+      const data = pagination;
+      data.currentPage = page;
+      data.size = size;
 
-      if (req.params.status != "any") {
-        status = req.params.status;
+      // get total order by status
+      const totalOrders = await getTotalOrdersByStatusOfUser(user_id, status_id);
+      data.total = totalOrders;
+
+      // get total pages
+      const totalPages = Math.ceil(totalOrders / size);
+      data.pages = totalPages == 0 ? 1 : totalPages;
+
+      // check if current page has next page and previous page
+      const check = checkNextAndPreviousPage(page, totalPages);
+      data.hasNext = check.hasNext;
+      data.hasPrevious = check.hasPrevious;
+
+      // get items
+      const start = Number(size * (page - 1));
+      const items = await getRangeOrdersByStatusOfUser(start, size, user_id, status_id);
+
+      // get store name by store id and status by status id
+      for (let i = 0; i < items.length; i++) {
+        const store = await getStoreById(items[i].store_id);
+        items[i].dataValues.store = store[0].name;
+        delete items[i].dataValues.store_id;
+        const status = await getStatusById(items[i].status);
+        items[i].dataValues.status = status[0].name;
       }
+      data.items = items;
 
-      const orderlist = await getUserOrderWithCommentList(account_id, status);
-
-      if (orderlist.length != 0) {
-        res.status(200).json(orderlist);
-      } else {
-        res.status(200).json({ message: "Error " });
-      }
+      res.status(200).json(data);
     } catch (err) {
       res.status(500).send(err);
     }
