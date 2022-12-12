@@ -192,6 +192,9 @@ const schemas = {
     page: page,
     size: size,
   }),
+  OrderId: Joi.object().keys({
+    order_id: order_id,
+  }),
 };
 
 module.exports = schemas;

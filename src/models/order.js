@@ -142,6 +142,17 @@ async function getRangeOrdersByStatus(start, size, store_id, status_id) {
   });
 }
 
+async function getOrderById(order_id) {
+  return await Order.findAll({
+    attributes: ["price", "address", "ship_fee", "timestamp", "payment_method"],
+    where: {
+      id: {
+        [Op.eq]: order_id,
+      },
+    },
+  });
+}
+
 async function getUserOrderWithCommentList(account_id, status) {
   try {
     const data = await sequelize.query(
@@ -296,4 +307,5 @@ module.exports = {
   calculateTotalPerDayWithLimit,
   getTotalOrdersByStatus,
   getRangeOrdersByStatus,
+  getOrderById,
 };

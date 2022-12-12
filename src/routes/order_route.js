@@ -16,6 +16,7 @@ router.route("/profit").get(middleware(schemas.profitPerDay, PROPERTY_TYPE.body)
 */
 router.route("/status-change").post(middleware(schemas.updateOrder, PROPERTY_TYPE.body), order.updateStatus);
 router.route("/get-store-orders").get(middleware(schemas.getStoreOrders, PROPERTY_TYPE.query), order.getStoreOrders);
+router.route("/get-order/:order_id").get(middleware(schemas.OrderId, PROPERTY_TYPE.params), order.getOrderDetail);
 
 //test
 router.get("/test", order.test);
