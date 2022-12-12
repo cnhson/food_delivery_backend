@@ -164,7 +164,7 @@ async function getMostOrderedProductsDesc() {
         "group by product_id order by amount desc ) 'ord_amount', " +
         "(SELECT s.name FROM food_delivery.store s where s.id = m.store_id) 'store_name' " +
         ", name, description, " +
-        "(SELECT pt.name FROM food_delivery.product_type pt where pt.store_id = m.store_id) 'type' " +
+        "(SELECT pt.name FROM food_delivery.product_type pt where pt.id = m.type_id) 'type' " +
         ",image, price from menu m order by ord_amount desc ",
       {
         type: QueryTypes.SELECT,
