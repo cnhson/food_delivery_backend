@@ -192,6 +192,12 @@ const schemas = {
     page: page,
     size: size,
   }),
+  getAccountOrders: Joi.object().keys({
+    user_id: owner_id,
+    status_id: status_id,
+    page: page,
+    size: size,
+  }),
   OrderId: Joi.object().keys({
     order_id: order_id,
   }),
