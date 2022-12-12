@@ -27,6 +27,7 @@ const account_id = Joi.string().length(10).required();
 const product_type_id = Joi.string().length(10).required();
 const store_id = Joi.string().length(10).required();
 const status_id = Joi.string().required();
+const store_type = Joi.string().required();
 
 const order_id = Joi.string().length(10).required();
 const comment = Joi.string().pattern(new RegExp("^[a-zA-Z]{3,2000}$")).required();
@@ -150,7 +151,7 @@ const schemas = {
     address: address,
     description: description,
     image: image,
-    type_id: type_id,
+    type_id: store_type,
     timestamp: timestamp,
   }),
 
@@ -190,6 +191,9 @@ const schemas = {
     status_id: status_id,
     page: page,
     size: size,
+  }),
+  OrderId: Joi.object().keys({
+    order_id: order_id,
   }),
 };
 

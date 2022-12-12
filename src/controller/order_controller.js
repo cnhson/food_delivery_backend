@@ -6,12 +6,15 @@ const {
   getTotalOrdersByStatus,
   getRangeOrdersByStatus,
   getOrderByAccount,
+  getOrderById,
 } = require("../models/order");
-const { insertOrderDetail } = require("../models/order_detail");
+const { insertOrderDetail, getOrderDetailById } = require("../models/order_detail");
 const crypto = require("crypto");
 const { getAccountByIdAndRole } = require("../models/account");
 const { pagination, checkNextAndPreviousPage } = require("../services/common");
 const { getStatusById } = require("../models/status");
+const { getProductTypeById } = require("../models/product_type");
+const { getProductById } = require("../models/menu");
 
 module.exports = {
   updateStatus: async function (req, res) {
@@ -190,6 +193,28 @@ module.exports = {
       res.status(200).json(data);
     } catch (err) {
       res.status(500).json(err);
+    }
+  },
+
+  getOrderDetail: async function (req, res) {
+    const order_id = req.params.order_id;
+
+    try {
+      const data = await getOrderById(order_id);
+
+      // get order detail
+      const order_detail = await getOrderDetailById(order_id);
+      for (let i = 0; i < order_detail.length; i++) {
+        // get type name of product
+        const type = await getProductById(order_detail[i].dataValues.product_id);
+        delete order_detail[i].product_id;
+        order_detail[i].dataValues.product = type[0].name;
+      }
+      data[0].dataValues.order_detail = order_detail;
+      res.status(200).json(data[0]);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
     }
   },
 

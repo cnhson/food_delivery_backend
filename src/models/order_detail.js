@@ -1,5 +1,5 @@
 const { sequelize } = require("../services/common");
-const { DataTypes } = require("sequelize");
+const { DataTypes, Op } = require("sequelize");
 
 const orderDetail = sequelize.define(
   "order_detail",
@@ -51,4 +51,15 @@ async function insertOrderDetail(order_id, product_id, quantity) {
   }
 }
 
-module.exports = { orderDetail, insertOrderDetail };
+async function getOrderDetailById(order_id) {
+  return await orderDetail.findAll({
+    attributes: ["product_id", "quantity"],
+    where: {
+      order_id: {
+        [Op.eq]: order_id,
+      },
+    },
+  });
+}
+
+module.exports = { orderDetail, insertOrderDetail, getOrderDetailById };
