@@ -113,8 +113,7 @@ module.exports = {
         return;
       } else {
         let comments = await getCommentsListFromStore(store_id);
-        const commemt_count = comments.length;
-        res.status(200).json({ commemt_count, comments });
+        res.status(200).json(comments);
       }
     } catch (err) {
       console.log("err");
