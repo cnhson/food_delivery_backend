@@ -1,5 +1,5 @@
 const { sequelize } = require("../services/common");
-const { DataTypes } = require("sequelize");
+const { DataTypes, QueryTypes } = require("sequelize");
 
 const Store = sequelize.define(
   "store",
@@ -145,10 +145,26 @@ async function getUserStore(owner_id) {
   }
 }
 
+async function getAll() {
+  try {
+    return await sequelize.query(
+      "select id, owner_id, name, address, description, " +
+        "(select st.name from store_type st where st.id = s.type_id) 'type_name', image, active_date from store s",
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+
 module.exports = {
   Store,
   insertStore,
   checkStoreByName,
+  getAll,
   getStoreById,
   updateStoreById,
   getUserStore,

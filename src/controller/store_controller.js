@@ -1,9 +1,20 @@
-const { insertStore, getStoreById, getUserStore, updateStoreById } = require("../models/store");
-
-const { pendingOrder, checkNewOrders } = require("../models/order");
+const { insertStore, getStoreById, getUserStore, updateStoreById, getAll } = require("../models/store");
+const { getCommentsListFromStore } = require("../models/comment");
+const { checkNewOrders } = require("../models/order");
 const { getProductByStore } = require("../models/menu");
 const { getAllType } = require("../models/store_type");
 module.exports = {
+  getAllStores: async function (req, res) {
+    try {
+      const data = await getAll();
+      if (data) {
+        res.status(200).json(data);
+      }
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  },
+
   getNewOrders: async function (req, res) {
     try {
       const store_id = req.body.store_id;
