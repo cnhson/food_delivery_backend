@@ -116,7 +116,7 @@ async function checkStoreByName(name) {
 async function getStoreById(id) {
   try {
     const data = await Store.findAll({
-      attributes: [`id`, `owner_id`, `name`, `address`, `description`, `type_id`, `image`, `active_date`, `timestamp`],
+      attributes: [`owner_id`, `name`, `address`, `description`, `type_id`, `image`, `active_date`, `timestamp`],
       where: {
         id: id,
       },

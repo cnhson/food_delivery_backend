@@ -99,6 +99,27 @@ async function getOrderByAccount(account_id, order_id) {
   });
 }
 
+async function getTotalOrdersByStatusOfUser(user_id, status_id) {
+  const total = await Order.findAll({
+    attributes: [[Sequelize.fn("COUNT", Sequelize.col("*")), "total_orders"]],
+    where: {
+      [Op.and]: [
+        {
+          status: {
+            [Op.eq]: status_id,
+          },
+        },
+        {
+          account_id: {
+            [Op.eq]: user_id,
+          },
+        },
+      ],
+    },
+  });
+  return total[0].dataValues.total_orders;
+}
+
 async function getTotalOrdersByStatus(store_id, status_id) {
   const total = await Order.findAll({
     attributes: [[Sequelize.fn("COUNT", Sequelize.col("*")), "total_orders"]],
@@ -139,6 +160,39 @@ async function getRangeOrdersByStatus(start, size, store_id, status_id) {
     order: [["timestamp", "DESC"]],
     offset: start,
     limit: size,
+  });
+}
+
+async function getRangeOrdersByStatusOfUser(start, size, user_id, status_id) {
+  return await Order.findAll({
+    where: {
+      [Op.and]: [
+        {
+          status: {
+            [Op.eq]: status_id,
+          },
+        },
+        {
+          account_id: {
+            [Op.eq]: user_id,
+          },
+        },
+      ],
+    },
+    order: [["timestamp", "DESC"]],
+    offset: start,
+    limit: size,
+  });
+}
+
+async function getOrderById(order_id) {
+  return await Order.findAll({
+    attributes: ["price", "address", "ship_fee", "timestamp", "payment_method"],
+    where: {
+      id: {
+        [Op.eq]: order_id,
+      },
+    },
   });
 }
 
@@ -296,4 +350,7 @@ module.exports = {
   calculateTotalPerDayWithLimit,
   getTotalOrdersByStatus,
   getRangeOrdersByStatus,
+  getOrderById,
+  getRangeOrdersByStatusOfUser,
+  getTotalOrdersByStatusOfUser,
 };

@@ -6,7 +6,7 @@ const schemas = require("../middleware/schema");
 router.get("/id=:sid", store.getStore);
 router.get("/get-all-stores", store.getAllStores);
 router.get("/homepage", store.loadUserStore);
-
+router.post("/comments", store.getStoreComments);
 router.route("/new-orders/").get(middleware(schemas.getNewOrders, PROPERTY_TYPE.body), store.getNewOrders);
 
 router.route("/create/").post(middleware(schemas.createStore, PROPERTY_TYPE.body), store.createStore);

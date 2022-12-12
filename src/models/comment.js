@@ -1,5 +1,5 @@
 const { sequelize } = require("../services/common");
-const { DataTypes, Op } = require("sequelize");
+const { DataTypes, Op, QueryTypes } = require("sequelize");
 
 const Comment = sequelize.define(
   "comment",
@@ -101,11 +101,15 @@ async function updateComment(comment_id, comment, image, star, updated) {
 
 async function getCommentsListFromStore(store_id) {
   try {
-    const data = await Comment.findAll({
-      where: {
-        store_id: store_id,
-      },
-    });
+    const data = await sequelize.query(
+      "SELECT id , (select name from account a where a.id = c.account_id) 'name' " +
+        ", comment, star, timestamp, updated FROM food_delivery.comment c where c.store_id = '" +
+        store_id +
+        "'",
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
     return data;
   } catch (err) {
     console.log(err);

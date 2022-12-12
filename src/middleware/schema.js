@@ -18,6 +18,7 @@ const description = name;
 const role_id = Joi.string().valid("CUS", "SEL").required();
 const owner_id = Joi.string().length(10).required();
 const comment_id = Joi.number().min(0).required();
+const store_type = Joi.string().required();
 
 const password = Joi.string().pattern(new RegExp("^[a-zA-Z0-9!@#$%^&*()+-/]{8,100}$")).required();
 const product_id = Joi.number().min(0).required();
@@ -150,7 +151,7 @@ const schemas = {
     address: address,
     description: description,
     image: image,
-    type_id: type_id,
+    type_id: store_type,
     timestamp: timestamp,
   }),
 
@@ -190,6 +191,15 @@ const schemas = {
     status_id: status_id,
     page: page,
     size: size,
+  }),
+  getAccountOrders: Joi.object().keys({
+    user_id: owner_id,
+    status_id: status_id,
+    page: page,
+    size: size,
+  }),
+  OrderId: Joi.object().keys({
+    order_id: order_id,
   }),
 };
 

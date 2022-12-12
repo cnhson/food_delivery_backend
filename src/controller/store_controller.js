@@ -99,7 +99,7 @@ module.exports = {
   editStore: async function (req, res) {
     try {
       const id = req.body.id;
-      const owner_id = req.owner_id;
+      const owner_id = req.body.owner_id;
       const name = req.body.name;
       const address = req.body.address;
       const description = req.body.description;
@@ -112,6 +112,22 @@ module.exports = {
         res.status(200).json({ message: "Edit store successfully" });
       }
     } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+
+  getStoreComments: async function (req, res) {
+    try {
+      const store_id = req.body.store_id;
+      if (store_id === null) {
+        res.status(200).json({ error: "Please input a store id" });
+        return;
+      } else {
+        let comments = await getCommentsListFromStore(store_id);
+        res.status(200).json(comments);
+      }
+    } catch (err) {
+      console.log("err");
       res.status(500).send(err);
     }
   },
