@@ -18,6 +18,7 @@ const description = name;
 const role_id = Joi.string().valid("CUS", "SEL").required();
 const owner_id = Joi.string().length(10).required();
 const comment_id = Joi.number().min(0).required();
+const store_type = Joi.string().required();
 
 const password = Joi.string().pattern(new RegExp("^[a-zA-Z0-9!@#$%^&*()+-/]{8,100}$")).required();
 const product_id = Joi.number().min(0).required();
@@ -27,7 +28,6 @@ const account_id = Joi.string().length(10).required();
 const product_type_id = Joi.string().length(10).required();
 const store_id = Joi.string().length(10).required();
 const status_id = Joi.string().required();
-const store_type = Joi.string().required();
 
 const order_id = Joi.string().length(10).required();
 const comment = Joi.string().pattern(new RegExp("^[a-zA-Z]{3,2000}$")).required();

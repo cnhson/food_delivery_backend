@@ -6,9 +6,9 @@ const {
   updateProductById,
   getProductByStore,
   getProductByIdAndStoreId,
+  getMostOrderedProductsDesc,
 } = require("../models/menu");
 
-const { getCommentsListFromStore } = require("../models/comment");
 const {
   insertProductType,
   getProductTypeByStoreId,
@@ -113,6 +113,17 @@ module.exports = {
     }
   },
 
+  //Uu tien product duoc order nhieu nhat len tren
+  getPopularProductsDesc: async function (req, res) {
+    try {
+      const data = await getMostOrderedProductsDesc();
+      res.status(200).json(data);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+  },
+
   getAllProducts: async function (req, res) {
     const storeId = req.params.storeId;
     try {
@@ -158,16 +169,14 @@ module.exports = {
 
   productInfo: async function (req, res) {
     try {
-      let productid = req.params.pid;
+      let productid = req.params.id;
       if (productid === null) {
         res.status(200).json({ error: "Please input a product id" });
         return;
       } else {
         let product = await getProductDetail(productid);
         if (product != null) {
-          let feedback = await getCommentsListFromStore(product.store.sid);
-          const feedbackcount = feedback.length;
-          res.status(200).json({ product, feedbackcount, feedback });
+          res.status(200).json(product);
           return;
         } else {
           res.status(200).json("Product not found");
