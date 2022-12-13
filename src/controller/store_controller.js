@@ -60,11 +60,10 @@ module.exports = {
       const sid = req.params.sid;
       console.log(sid);
       if (sid != null) {
-        const getstore = getStoreById(sid);
-        const getproducts = getProductByStore(sid);
-        const [store, products] = await Promise.all([getstore, getproducts]);
+        const store = await getStoreById(sid);
+        const products = await getProductByStore(sid);
         //console.log([f_store, f_products]);
-        if ([store, products]) {
+        if (store && products) {
           res.status(200).json({ store, products });
         }
       } else {

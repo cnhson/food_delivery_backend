@@ -74,11 +74,15 @@ async function addProduct(store_id, name, description, type_id, image, price) {
 }
 
 async function getProductByStore(store_id) {
-  return await Menu.findAll({
-    where: {
-      store_id: store_id,
-    },
-  });
+  return await sequelize.query(
+    "select id, name, (select pt.name from product_type pt where pt.id = m.type_id) 'type_name', description, image, price, out_of_stock, del_flag from menu m " +
+      "where m.store_id = '" +
+      store_id +
+      "'",
+    {
+      type: QueryTypes.SELECT,
+    }
+  );
 }
 
 async function getProductById(id) {

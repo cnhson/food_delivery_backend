@@ -115,12 +115,15 @@ async function checkStoreByName(name) {
 
 async function getStoreById(id) {
   try {
-    const data = await Store.findAll({
-      attributes: [`owner_id`, `name`, `address`, `description`, `type_id`, `image`, `active_date`, `timestamp`],
-      where: {
-        id: id,
-      },
-    });
+    const data = await sequelize.query(
+      "SELECT name, address, description, " +
+        "(select st.name from store_type st where st.id = s.type_id) 'type_name', image, active_date FROM food_delivery.store s where s.id = '" +
+        id +
+        "'",
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
     if (data.length > 0) {
       return data;
     } else {
