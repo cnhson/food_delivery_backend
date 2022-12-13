@@ -191,7 +191,7 @@ async function getProductDetail(id) {
     );
     //Filter product store
     const p_store = await sequelize.query(
-      "SELECT s.id 'sid', owner_id, s.name 'sname', s.address, s.description 'sdes', s.type_id 'stype', s.active_date " +
+      "SELECT s.id 'sid', owner_id, s.name 'sname', s.image ,s.address, s.description 'sdes', s.type_id 'stype', s.active_date " +
         "from menu m inner join store s on m.store_id = s.id where m.id = " +
         id,
       {
