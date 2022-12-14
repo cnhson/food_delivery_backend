@@ -163,7 +163,7 @@ async function getProductByIdAndStoreId(id, store_id) {
 async function getMostOrderedProductsDesc() {
   try {
     const data = await sequelize.query(
-      "select m.id 'pid', " +
+      "select m.id 'pid', m.store_id 'sid', " +
         "(SELECT count(product_id) 'amount' FROM food_delivery.order_detail od where od.product_id = m.id " +
         "group by product_id order by amount desc ) 'ord_amount', " +
         "(SELECT s.name FROM food_delivery.store s where s.id = m.store_id) 'store_name' " +
