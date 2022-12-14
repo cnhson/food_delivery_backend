@@ -119,6 +119,7 @@ const schemas = {
   createOrder: Joi.object().keys({
     order_id: order_id,
     account_id: account_id,
+    product_id: Joi.number.required();
     store_id: store_id,
     order_detail: Joi.array().items(
       Joi.object().keys({
