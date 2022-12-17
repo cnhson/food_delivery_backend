@@ -9,14 +9,6 @@ const Order = sequelize.define(
       type: DataTypes.STRING(25),
       primaryKey: true,
     },
-    store_id: {
-      type: DataTypes.STRING(25),
-      allowNull: false,
-      references: {
-        model: "store",
-        key: "id",
-      },
-    },
     account_id: {
       type: DataTypes.STRING(10),
       allowNull: false,
@@ -24,10 +16,6 @@ const Order = sequelize.define(
         model: "account",
         key: "id",
       },
-    },
-    price: {
-      type: DataTypes.STRING(50),
-      allowNull: false,
     },
     address: {
       type: DataTypes.STRING(50),
@@ -59,13 +47,11 @@ const Order = sequelize.define(
   }
 );
 
-async function insertOrder(order_id, store_id, account_id, price, address, ship_fee, payment_method, timestamp) {
+async function insertOrder(order_id, account_id, address, ship_fee, payment_method, timestamp) {
   try {
     await Order.create({
       id: order_id,
-      store_id: store_id,
       account_id: account_id,
-      price: price,
       address: address,
       ship_fee: ship_fee,
       payment_method: payment_method,

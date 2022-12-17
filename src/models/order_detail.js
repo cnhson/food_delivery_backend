@@ -26,9 +26,22 @@ const orderDetail = sequelize.define(
         type: "id",
       },
     },
-    quantity: {
-      type: DataTypes.STRING,
+    store_id: {
+      type: DataTypes.STRING(25),
       allowNull: false,
+      references: {
+        model: "store",
+        key: "id",
+      },
+    },
+
+    quantity: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    price: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
     },
   },
   {
@@ -36,12 +49,14 @@ const orderDetail = sequelize.define(
   }
 );
 
-async function insertOrderDetail(order_id, product_id, quantity) {
+async function insertOrderDetail(order_id, product_id, quantity, store_id, price) {
   try {
     await orderDetail.create({
       order_id: order_id,
       product_id: product_id,
       quantity: quantity,
+      store_id: store_id,
+      price: price,
     });
 
     return true;

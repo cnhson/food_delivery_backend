@@ -86,11 +86,9 @@ module.exports = {
     try {
       const order_id = req.body.order_id;
       const account_id = req.body.account_id;
-      const store_id = req.body.store_id;
       const order_detail = req.body.order_detail;
       const payment_method = req.body.payment_method;
       const ship_fee = req.body.ship_fee;
-      const price = req.body.price;
       const address = req.body.address;
       const timestamp = req.body.timestamp;
 
@@ -103,26 +101,17 @@ module.exports = {
       }
 
       // insert order into db
-      const result1 = await insertOrder(
-        order_id,
-        store_id,
-        account_id,
-        price,
-        address,
-        ship_fee,
-        payment_method,
-        timestamp
-      );
-      if (!result1) {
+      const order_res = await insertOrder(order_id, account_id, address, ship_fee, payment_method, timestamp);
+      if (!order_res) {
         res.status(500).json({ error: "Create order failed!" });
         return;
       }
 
       // insert order detail to db
       for (let i = 0; i < order_detail.length; i++) {
-        const { product_id, quantity } = order_detail[i];
-        const result2 = await insertOrderDetail(order_id, product_id, quantity);
-        if (!result2) {
+        const { product_id, store_id, price, quantity } = order_detail[i];
+        const orderdetail_res = await insertOrderDetail(order_id, product_id, quantity, store_id, price);
+        if (!orderdetail_res) {
           res.status(500).json({ error: "Create order detail failed!" });
           return;
         }

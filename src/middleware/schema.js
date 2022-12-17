@@ -37,7 +37,7 @@ const star = Joi.number().required();
 const type_id = Joi.string().alphanum().length(10).required();
 
 const price = Joi.string().min(1).max(25).required();
-const quantity = Joi.string().max(25).required();
+const quantity = Joi.number().required();
 const ship_fee = Joi.string().max(25).required();
 
 const payment_method = Joi.string().alphanum().required();
@@ -119,18 +119,17 @@ const schemas = {
   createOrder: Joi.object().keys({
     order_id: order_id,
     account_id: account_id,
-    product_id: Joi.number().required(),
-    store_id: store_id,
     order_detail: Joi.array().items(
       Joi.object().keys({
         product_id: product_id,
+        store_id: store_id,
+        price: Joi.string().required(),
         quantity: quantity,
       })
     ),
     address: address,
     payment_method: payment_method,
     ship_fee: ship_fee,
-    price: price,
     timestamp: timestamp,
   }),
 

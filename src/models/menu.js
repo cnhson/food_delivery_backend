@@ -75,7 +75,7 @@ async function addProduct(store_id, name, description, type_id, image, price) {
 
 async function getProductByStore(store_id) {
   return await sequelize.query(
-    "select id, name, (select pt.name from product_type pt where pt.id = m.type_id) 'type_name', description, image, price, out_of_stock, del_flag from menu m " +
+    "select id, name, store_id 'sis' ,(select pt.name from product_type pt where pt.id = m.type_id) 'type_name', description, image, price, out_of_stock, del_flag from menu m " +
       "where m.store_id = '" +
       store_id +
       "'",
@@ -169,7 +169,7 @@ async function getMostOrderedProductsDesc() {
         "(SELECT s.name FROM food_delivery.store s where s.id = m.store_id) 'store_name' " +
         ", name, description, " +
         "(SELECT pt.name FROM food_delivery.product_type pt where pt.id = m.type_id) 'type' " +
-        ",image, price from menu m order by ord_amount desc ",
+        ",image, price , m.out_of_stock, m.del_flag from menu m order by ord_amount desc ",
       {
         type: QueryTypes.SELECT,
       }
@@ -186,7 +186,7 @@ async function getProductDetail(id) {
   try {
     //Filter product info
     const p_info = await sequelize.query(
-      "SELECT m.id, m.name, m.description 'des', p.name 'type', m.image, price, m.out_of_stock, m.del_flag " +
+      "SELECT m.id, m.store_id 'sid' ,m.name, m.description 'des', p.name 'type', m.image, price, m.out_of_stock, m.del_flag " +
         "from menu m inner join product_type p on m.type_id = p.id where m.id = " +
         id,
       {
