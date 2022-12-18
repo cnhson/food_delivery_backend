@@ -1,6 +1,7 @@
 const { sequelize } = require("../services/common");
 const { DataTypes, Op, QueryTypes, Sequelize } = require("sequelize");
 const { orderDetail } = require("./order_detail");
+const { query } = require("express");
 
 const Order = sequelize.define(
   "order",
@@ -86,24 +87,17 @@ async function getOrderByAccount(account_id, order_id) {
 }
 
 async function getTotalOrdersByStatusOfUser(user_id, status_id) {
-  const total = await Order.findAll({
-    attributes: [[Sequelize.fn("COUNT", Sequelize.col("*")), "total_orders"]],
-    where: {
-      [Op.and]: [
-        {
-          status: {
-            [Op.eq]: status_id,
-          },
-        },
-        {
-          account_id: {
-            [Op.eq]: user_id,
-          },
-        },
-      ],
-    },
-  });
-  return total[0].dataValues.total_orders;
+  const total = await sequelize.query(
+    "select count(id) as 'total_count' from food_delivery.order where account_id = '" +
+      user_id +
+      "' and status = '" +
+      status_id +
+      "'",
+    {
+      type: QueryTypes.SELECT,
+    }
+  );
+  return total[0].total_count;
 }
 
 async function getTotalOrdersByStatus(store_id, status_id) {
@@ -173,7 +167,8 @@ async function getRangeOrdersByStatusOfUser(start, size, user_id, status_id) {
 
 async function getOrderById(order_id) {
   return await Order.findAll({
-    attributes: ["price", "address", "ship_fee", "timestamp", "payment_method"],
+    raw: true,
+    attributes: ["id", "address", "ship_fee", "timestamp", "payment_method"],
     where: {
       id: {
         [Op.eq]: order_id,

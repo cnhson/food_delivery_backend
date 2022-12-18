@@ -10,14 +10,14 @@ const {
   getTotalOrdersByStatusOfUser,
   getRangeOrdersByStatusOfUser,
 } = require("../models/order");
-const { insertOrderDetail, getOrderDetailById } = require("../models/order_detail");
+const { insertOrderDetail, getOrderDetailById, getTotalPriceByOrderId } = require("../models/order_detail");
 const crypto = require("crypto");
 const { getAccountByIdAndRole } = require("../models/account");
 const { pagination, checkNextAndPreviousPage } = require("../services/common");
 const { getStatusById } = require("../models/status");
-const { getProductTypeById } = require("../models/product_type");
-const { getProductById } = require("../models/menu");
-const { getStoreById } = require("../models/store");
+//const { getProductTypeById } = require("../models/product_type");
+//const { getProductById } = require("../models/menu");
+//const { getStoreById } = require("../models/store");
 
 module.exports = {
   updateStatus: async function (req, res) {
@@ -101,8 +101,8 @@ module.exports = {
       }
 
       // insert order into db
-      const order_res = await insertOrder(order_id, account_id, address, ship_fee, payment_method, timestamp);
-      if (!order_res) {
+      const order = await insertOrder(order_id, account_id, address, ship_fee, payment_method, timestamp);
+      if (!order) {
         res.status(500).json({ error: "Create order failed!" });
         return;
       }
@@ -128,13 +128,14 @@ module.exports = {
     const status_id = req.query.status_id;
     const page = Number(req.query.page);
     const size = Number(req.query.size);
+
     try {
       const data = pagination;
       data.currentPage = page;
       data.size = size;
-
       // get total order by status
       const totalOrders = await getTotalOrdersByStatusOfUser(user_id, status_id);
+
       data.total = totalOrders;
 
       // get total pages
@@ -150,19 +151,16 @@ module.exports = {
       const start = Number(size * (page - 1));
       const items = await getRangeOrdersByStatusOfUser(start, size, user_id, status_id);
 
-      // get store name by store id and status by status id
-      for (let i = 0; i < items.length; i++) {
-        const store = await getStoreById(items[i].store_id);
-        items[i].dataValues.store = store[0].name;
-        delete items[i].dataValues.store_id;
-        const status = await getStatusById(items[i].status);
-        items[i].dataValues.status = status[0].name;
+      for (let i in items) {
+        let ttprice = await getTotalPriceByOrderId(items[i].id);
+        items[i].dataValues.totalprice = ttprice;
       }
+
       data.items = items;
 
       res.status(200).json(data);
     } catch (err) {
-      res.status(500).send(err);
+      res.status(500).send("Error");
     }
   },
 
@@ -214,18 +212,27 @@ module.exports = {
     const order_id = req.params.order_id;
 
     try {
-      const data = await getOrderById(order_id);
+      const order = await getOrderById(order_id);
 
-      // get order detail
-      const order_detail = await getOrderDetailById(order_id);
-      for (let i = 0; i < order_detail.length; i++) {
-        // get type name of product
-        const type = await getProductById(order_detail[i].dataValues.product_id);
-        delete order_detail[i].product_id;
-        order_detail[i].dataValues.product = type[0].name;
+      const orderdetail = await getOrderDetailById(order_id);
+
+      let totalprice = 0;
+      for (let item in orderdetail) {
+        temp_total = orderdetail[item].quantity * parseFloat(orderdetail[item].price);
+        totalprice += temp_total;
       }
-      data[0].dataValues.order_detail = order_detail;
-      res.status(200).json(data[0]);
+
+      const data = {
+        // id: order[0].id,
+        // totalprice: totalprice,
+        address: order[0].address,
+        ship_fee: order[0].ship_fee,
+        // timestamp: order[0].timestamp,
+        // payment_method: order[0].payment_method,
+        order_detail: orderdetail,
+      };
+
+      res.status(200).json(data);
     } catch (err) {
       console.log(err);
       res.status(500).send(err);

@@ -1,5 +1,5 @@
 const { sequelize } = require("../services/common");
-const { DataTypes, Op } = require("sequelize");
+const { DataTypes, QueryTypes } = require("sequelize");
 
 const orderDetail = sequelize.define(
   "order_detail",
@@ -67,14 +67,26 @@ async function insertOrderDetail(order_id, product_id, quantity, store_id, price
 }
 
 async function getOrderDetailById(order_id) {
-  return await orderDetail.findAll({
-    attributes: ["product_id", "quantity"],
-    where: {
-      order_id: {
-        [Op.eq]: order_id,
-      },
-    },
-  });
+  return await sequelize.query(
+    "select product_id, " +
+      "(select name from menu m where od.product_id = m.id) 'product_name', store_id, " +
+      "(select name from store s where od.store_id = s.id) 'store_name', quantity, price from order_detail od where od.order_id = '" +
+      order_id +
+      "'",
+    {
+      type: QueryTypes.SELECT,
+    }
+  );
 }
 
-module.exports = { orderDetail, insertOrderDetail, getOrderDetailById };
+async function getTotalPriceByOrderId(order_id) {
+  const data = await sequelize.query(
+    "select SUM(quantity * price) as 'total' from order_detail where order_id = '" + order_id + "'",
+    {
+      type: QueryTypes.SELECT,
+    }
+  );
+  if (data) return data[0].total;
+}
+
+module.exports = { orderDetail, insertOrderDetail, getOrderDetailById, getTotalPriceByOrderId };
