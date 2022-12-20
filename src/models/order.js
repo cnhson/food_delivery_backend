@@ -42,13 +42,22 @@ const Order = sequelize.define(
         key: "id",
       },
     },
+    product_count: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    progress: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: 0,
+    },
   },
   {
     timestamps: false,
   }
 );
 
-async function insertOrder(order_id, account_id, address, ship_fee, payment_method, timestamp) {
+async function insertOrder(order_id, account_id, address, ship_fee, payment_method, product_count, timestamp) {
   try {
     await Order.create({
       id: order_id,
@@ -56,6 +65,7 @@ async function insertOrder(order_id, account_id, address, ship_fee, payment_meth
       address: address,
       ship_fee: ship_fee,
       payment_method: payment_method,
+      product_count: product_count,
       status: "NRY",
       timestamp: timestamp,
     });
@@ -101,68 +111,74 @@ async function getTotalOrdersByStatusOfUser(user_id, status_id) {
 }
 
 async function getTotalOrdersByStatus(store_id, status_id) {
-  const total = await Order.findAll({
-    attributes: [[Sequelize.fn("COUNT", Sequelize.col("*")), "total_orders"]],
-    where: {
-      [Op.and]: [
-        {
-          status: {
-            [Op.eq]: status_id,
-          },
-        },
-        {
-          store_id: {
-            [Op.eq]: store_id,
-          },
-        },
-      ],
-    },
-  });
-  return total[0].dataValues.total_orders;
+  const total = await sequelize.query(
+    "select count(o.id) as 'total_orders' from food_delivery.order o inner join order_detail od on o.id = od.order_id where store_id = '" +
+      store_id +
+      "' and status = '" +
+      status_id +
+      "'",
+    {
+      type: QueryTypes.SELECT,
+    }
+  );
+  return total[0].total_orders;
 }
 
 async function getRangeOrdersByStatus(start, size, store_id, status_id) {
-  return await Order.findAll({
-    where: {
-      [Op.and]: [
-        {
-          status: {
-            [Op.eq]: status_id,
-          },
-        },
-        {
-          store_id: {
-            [Op.eq]: store_id,
-          },
-        },
-      ],
-    },
-    order: [["timestamp", "DESC"]],
-    offset: start,
-    limit: size,
-  });
+  // return await Order.findAll({
+  //   where: {
+  //     [Op.and]: [
+  //       {
+  //         status: {
+  //           [Op.eq]: status_id,
+  //         },
+  //       },
+  //       {
+  //         store_id: {
+  //           [Op.eq]: store_id,
+  //         },
+  //       },
+  //     ],
+  //   },
+  //   order: [["timestamp", "DESC"]],
+  //   offset: start,
+  //   limit: size,
+  const data = await sequelize.query(
+    "SELECT o.id, (select email from account a where a.id = o.account_id) 'email', timestamp, payment_method, " +
+      "(select name from status s where s.id = o.status) 'status', progress FROM food_delivery.order o inner join order_detail od on o.id = od.order_id " +
+      "where store_id = '" +
+      store_id +
+      "' order by timestamp DESC limit " +
+      size +
+      " offset " +
+      start,
+    {
+      type: QueryTypes.SELECT,
+    }
+  );
+  return data;
 }
 
 async function getRangeOrdersByStatusOfUser(start, size, user_id, status_id) {
-  return await Order.findAll({
-    where: {
-      [Op.and]: [
-        {
-          status: {
-            [Op.eq]: status_id,
-          },
-        },
-        {
-          account_id: {
-            [Op.eq]: user_id,
-          },
-        },
-      ],
-    },
-    order: [["timestamp", "DESC"]],
-    offset: start,
-    limit: size,
-  });
+  // return await Order.findAll({
+  //   where: {
+  //     [Op.and]: [
+  //       {
+  //         status: {
+  //           [Op.eq]: status_id,
+  //         },
+  //       },
+  //       {
+  //         account_id: {
+  //           [Op.eq]: user_id,
+  //         },
+  //       },
+  //     ],
+  //   },
+  //   order: [["timestamp", "DESC"]],
+  //   offset: start,
+  //   limit: size,
+  // });
 }
 
 async function getOrderById(order_id) {

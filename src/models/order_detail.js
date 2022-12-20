@@ -43,6 +43,11 @@ const orderDetail = sequelize.define(
       type: DataTypes.STRING(50),
       allowNull: true,
     },
+    proceed: {
+      type: DataTypes.TINYINT(1),
+      allowNull: true,
+      defaultValue: 0,
+    },
   },
   {
     timestamps: false,

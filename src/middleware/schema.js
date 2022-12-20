@@ -128,6 +128,7 @@ const schemas = {
       })
     ),
     address: address,
+    product_count: Joi.number().required(),
     payment_method: payment_method,
     ship_fee: ship_fee,
     timestamp: timestamp,

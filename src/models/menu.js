@@ -75,7 +75,7 @@ async function addProduct(store_id, name, description, type_id, image, price) {
 
 async function getProductByStore(store_id) {
   return await sequelize.query(
-    "select id, name, store_id 'sis' ,(select pt.name from product_type pt where pt.id = m.type_id) 'type_name', description, image, price, out_of_stock, del_flag from menu m " +
+    "select id, name, store_id 'sis' ,(select pt.name from product_type pt where pt.id = m.type_id) 'type', description, image, price, out_of_stock, del_flag from menu m " +
       "where m.store_id = '" +
       store_id +
       "'",

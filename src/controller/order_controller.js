@@ -88,6 +88,7 @@ module.exports = {
       const account_id = req.body.account_id;
       const order_detail = req.body.order_detail;
       const payment_method = req.body.payment_method;
+      const product_count = req.product_count;
       const ship_fee = req.body.ship_fee;
       const address = req.body.address;
       const timestamp = req.body.timestamp;
@@ -101,7 +102,15 @@ module.exports = {
       }
 
       // insert order into db
-      const order = await insertOrder(order_id, account_id, address, ship_fee, payment_method, timestamp);
+      const order = await insertOrder(
+        order_id,
+        account_id,
+        address,
+        ship_fee,
+        payment_method,
+        product_count,
+        timestamp
+      );
       if (!order) {
         res.status(500).json({ error: "Create order failed!" });
         return;
@@ -193,13 +202,13 @@ module.exports = {
       const items = await getRangeOrdersByStatus(start, size, store_id, status_id);
 
       // get email by account id and status by status id
-      for (let i = 0; i < items.length; i++) {
-        const email = await getAccountByIdAndRole(items[i].account_id, "CUS");
-        delete items[i].dataValues.account_id;
-        items[i].dataValues.email = email[0].email;
-        const status = await getStatusById(items[i].status);
-        items[i].dataValues.status = status[0].name;
-      }
+      // for (let i = 0; i < items.length; i++) {
+      //   const email = await getAccountByIdAndRole(items[i].account_id, "CUS");
+      //   delete items[i].dataValues.account_id;
+      //   items[i].dataValues.email = email[0].email;
+      //   const status = await getStatusById(items[i].status);
+      //   items[i].dataValues.status = status[0].name;
+      // }
       data.items = items;
 
       res.status(200).json(data);

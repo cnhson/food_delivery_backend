@@ -133,11 +133,6 @@ module.exports = {
         return;
       }
 
-      for (let i = 0; i < data.length; i++) {
-        const typeName = await getProductTypeById(data[i].type_id);
-        data[i].dataValues.type = typeName[0].name;
-      }
-
       res.status(200).json(data);
     } catch (err) {
       console.log(err);
