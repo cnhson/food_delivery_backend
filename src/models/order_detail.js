@@ -62,6 +62,7 @@ async function insertOrderDetail(order_id, product_id, quantity, store_id, price
       quantity: quantity,
       store_id: store_id,
       price: price,
+      proceed: 0,
     });
 
     return true;

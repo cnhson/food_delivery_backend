@@ -8,6 +8,9 @@ router.route("/get-history/").get(middleware(schemas.getAccountOrders, PROPERTY_
 
 router.route("/create").post(middleware(schemas.createOrder, PROPERTY_TYPE.body), order.createOrder);
 router.route("/profit").get(middleware(schemas.profitPerDay, PROPERTY_TYPE.body), order.profitPerDate);
+router
+  .route("/proceed")
+  .post(middleware(schemas.proceedOrderWithStore, PROPERTY_TYPE.body), order.proceedOrderWithStore);
 
 /*
     api used to update status of order if store owner call this api

@@ -1,13 +1,17 @@
 const {
   insertOrder,
   getUserOrderWithCommentList,
-  calculateTotalPerDayWithLimit,
+  //calculateTotalPerDayWithLimit,
   updateStatus,
   getTotalOrdersByStatus,
   getRangeOrdersByStatus,
   getOrderByAccount,
   getOrderById,
   getTotalOrdersByStatusOfUser,
+  checkProgressAndSetOrderStatus,
+  checkproceedOrderDetail,
+  proceedOrderDetail,
+  progressOrder,
   getRangeOrdersByStatusOfUser,
 } = require("../models/order");
 const { insertOrderDetail, getOrderDetailById, getTotalPriceByOrderId } = require("../models/order_detail");
@@ -25,7 +29,6 @@ module.exports = {
       const order_id = req.body.order_id;
       const account_id = req.body.account_id;
       const status_id = req.body.status_id;
-      console.log(status_id);
 
       // check if account is seller or account is customer who own this order
       const check = await getAccountByIdAndRole(account_id, "SEL");
@@ -55,6 +58,31 @@ module.exports = {
       }
     } catch (err) {
       console.log(err);
+      res.status(500).send(err);
+    }
+  },
+
+  proceedOrderWithStore: async function (req, res) {
+    try {
+      const store_id = req.body.store_id;
+      const order_id = req.body.order_id;
+      const product_id = req.body.product_id;
+
+      const check = await checkproceedOrderDetail(order_id, product_id, store_id);
+      if (check === 1) {
+        checkProgressAndSetOrderStatus(order_id);
+        res.status(200).json({ error: "Already proceeded" });
+      } else {
+        const proceed = await proceedOrderDetail(order_id, product_id, store_id);
+        if (proceed) {
+          const progress = await progressOrder(order_id);
+          if (progress) {
+            checkProgressAndSetOrderStatus(order_id);
+            res.status(200).json({ message: "Order proceeding" });
+          }
+        }
+      }
+    } catch (err) {
       res.status(500).send(err);
     }
   },
@@ -146,7 +174,6 @@ module.exports = {
       const totalOrders = await getTotalOrdersByStatusOfUser(user_id, status_id);
 
       data.total = totalOrders;
-
       // get total pages
       const totalPages = Math.ceil(totalOrders / size);
       data.pages = totalPages == 0 ? 1 : totalPages;
@@ -159,14 +186,13 @@ module.exports = {
       // get items
       const start = Number(size * (page - 1));
       const items = await getRangeOrdersByStatusOfUser(start, size, user_id, status_id);
-
+      console.log(items);
       for (let i in items) {
         let ttprice = await getTotalPriceByOrderId(items[i].id);
         items[i].dataValues.totalprice = ttprice;
       }
 
       data.items = items;
-
       res.status(200).json(data);
     } catch (err) {
       res.status(500).send("Error");

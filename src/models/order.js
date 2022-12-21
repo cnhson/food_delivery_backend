@@ -68,6 +68,8 @@ async function insertOrder(order_id, account_id, address, ship_fee, payment_meth
       product_count: product_count,
       status: "NRY",
       timestamp: timestamp,
+      product_count: 0,
+      progress: 0,
     });
 
     return true;
@@ -110,6 +112,98 @@ async function getTotalOrdersByStatusOfUser(user_id, status_id) {
   return total[0].total_count;
 }
 
+async function checkproceedOrderDetail(order_id, product_id, store_id) {
+  try {
+    const data = await sequelize.query(
+      "select proceed from food_delivery.order_detail where order_id = '" +
+        order_id +
+        "' and product_id = '" +
+        product_id +
+        "' and store_id ='" +
+        store_id +
+        "'",
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+    return data[0].proceed;
+  } catch (error) {
+    return error;
+  }
+}
+
+async function proceedOrderDetail(order_id, product_id, store_id) {
+  try {
+    await orderDetail.update(
+      { proceed: 1 },
+      {
+        where: {
+          order_id: order_id,
+          product_id: product_id,
+          store_id: store_id,
+        },
+      }
+    );
+    return true;
+  } catch (error) {
+    return error;
+  }
+}
+
+async function progressOrder(order_id) {
+  try {
+    await sequelize.query("update food_delivery.order set progress = progress + 1 where id = '" + order_id + "'", {
+      type: QueryTypes.UPDATE,
+    });
+    return true;
+  } catch (error) {
+    return error;
+  }
+}
+
+async function checkProgressAndSetOrderStatus(order_id) {
+  try {
+    const equal = await sequelize.query(
+      "select progress = product_count as 'is_true' from food_delivery.order where id = '" + order_id + "'",
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    if (equal[0].is_true === 1) {
+      await sequelize.query("update food_delivery.order set status = 'SHP' where id = '" + order_id + "'", {
+        type: QueryTypes.SELECT,
+      });
+      return true;
+    } else {
+      await sequelize.query("update food_delivery.order set status = 'RCD' where id = '" + order_id + "'", {
+        type: QueryTypes.SELECT,
+      });
+      return true;
+    }
+  } catch (error) {
+    return error;
+  }
+}
+
+// async function deproceedOrderDetail(order_id, store_id, product_id) {
+//   try {
+//     await orderDetail.update(
+//       { proceed: 0 },
+//       {
+//         where: {
+//           order_id: order_id,
+//           product_id: product_id,
+//           store_id: store_id,
+//         },
+//       }
+//     );
+//     return true;
+//   } catch (error) {
+//     return false;
+//   }
+// }
+
 async function getTotalOrdersByStatus(store_id, status_id) {
   const total = await sequelize.query(
     "select count(o.id) as 'total_orders' from food_delivery.order o inner join order_detail od on o.id = od.order_id where store_id = '" +
@@ -125,27 +219,11 @@ async function getTotalOrdersByStatus(store_id, status_id) {
 }
 
 async function getRangeOrdersByStatus(start, size, store_id, status_id) {
-  // return await Order.findAll({
-  //   where: {
-  //     [Op.and]: [
-  //       {
-  //         status: {
-  //           [Op.eq]: status_id,
-  //         },
-  //       },
-  //       {
-  //         store_id: {
-  //           [Op.eq]: store_id,
-  //         },
-  //       },
-  //     ],
-  //   },
-  //   order: [["timestamp", "DESC"]],
-  //   offset: start,
-  //   limit: size,
   const data = await sequelize.query(
-    "SELECT o.id, (select email from account a where a.id = o.account_id) 'email', timestamp, payment_method, " +
-      "(select name from status s where s.id = o.status) 'status', progress FROM food_delivery.order o inner join order_detail od on o.id = od.order_id " +
+    "SELECT o.id, (select email from account a where a.id = o.account_id) 'email', timestamp, payment_method, product_id, " +
+      "(select name from menu m where m.id = product_id) 'product', " +
+      "(select name from status s where s.id = o.status) 'status', progress, proceed " +
+      "FROM food_delivery.order o inner join order_detail od on o.id = od.order_id " +
       "where store_id = '" +
       store_id +
       "' order by timestamp DESC limit " +
@@ -160,25 +238,25 @@ async function getRangeOrdersByStatus(start, size, store_id, status_id) {
 }
 
 async function getRangeOrdersByStatusOfUser(start, size, user_id, status_id) {
-  // return await Order.findAll({
-  //   where: {
-  //     [Op.and]: [
-  //       {
-  //         status: {
-  //           [Op.eq]: status_id,
-  //         },
-  //       },
-  //       {
-  //         account_id: {
-  //           [Op.eq]: user_id,
-  //         },
-  //       },
-  //     ],
-  //   },
-  //   order: [["timestamp", "DESC"]],
-  //   offset: start,
-  //   limit: size,
-  // });
+  return await Order.findAll({
+    where: {
+      [Op.and]: [
+        {
+          status: {
+            [Op.eq]: status_id,
+          },
+        },
+        {
+          account_id: {
+            [Op.eq]: user_id,
+          },
+        },
+      ],
+    },
+    order: [["timestamp", "DESC"]],
+    offset: start,
+    limit: size,
+  });
 }
 
 async function getOrderById(order_id) {
@@ -237,23 +315,6 @@ async function getUserOrderWithCommentList(account_id, status) {
   }
 }
 
-async function pendingOrder(id, account_id) {
-  try {
-    await Order.update({
-      status: "pending",
-      where: {
-        id: id,
-        account_id: account_id,
-      },
-    });
-
-    return true;
-  } catch (err) {
-    console.log(err);
-    return false;
-  }
-}
-
 async function updateStatus(id, status_id) {
   try {
     await Order.update(
@@ -273,23 +334,6 @@ async function updateStatus(id, status_id) {
   } catch (err) {
     console.log(err);
     return false;
-  }
-}
-
-async function checkNewOrders(store_id) {
-  try {
-    const data = await sequelize.query(
-      "select o.id, account_id, product_id,quantity,price, ship_fee, o.timestamp, payment_method, status from food_delivery.order o " +
-        "inner join order_detail od on o.id = od.order_id where status = 'noticed' and store_id = " +
-        store_id,
-      {
-        type: QueryTypes.SELECT,
-      }
-    );
-    return data;
-  } catch (err) {
-    console.log(err);
-    return null;
   }
 }
 
@@ -339,12 +383,15 @@ async function calculateTotalPerDayWithLimit(store_id, limit) {
 module.exports = {
   Order,
   insertOrder,
+  progressOrder,
+  proceedOrderDetail,
+  checkproceedOrderDetail,
+  checkProgressAndSetOrderStatus,
+  //deproceedOrderDetail,
   getOrderByAccount,
   getUserOrderWithCommentList,
-  checkNewOrders,
-  pendingOrder,
   updateStatus,
-  calculateTotalPerDayWithLimit,
+  //calculateTotalPerDayWithLimit,
   getTotalOrdersByStatus,
   getRangeOrdersByStatus,
   getOrderById,

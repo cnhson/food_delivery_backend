@@ -116,6 +116,12 @@ const schemas = {
     name: name,
   }),
 
+  proceedOrderWithStore: Joi.object().keys({
+    order_id: order_id,
+    product_id: product_id,
+    store_id: store_id,
+  }),
+
   createOrder: Joi.object().keys({
     order_id: order_id,
     account_id: account_id,
