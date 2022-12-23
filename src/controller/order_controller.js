@@ -186,7 +186,7 @@ module.exports = {
       // get items
       const start = Number(size * (page - 1));
       const items = await getRangeOrdersByStatusOfUser(start, size, user_id, status_id);
-      console.log(items);
+
       for (let i in items) {
         let ttprice = await getTotalPriceByOrderId(items[i].id);
         items[i].dataValues.totalprice = ttprice;

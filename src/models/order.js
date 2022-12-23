@@ -68,7 +68,7 @@ async function insertOrder(order_id, account_id, address, ship_fee, payment_meth
       product_count: product_count,
       status: "NRY",
       timestamp: timestamp,
-      product_count: 0,
+      product_count: product_count,
       progress: 0,
     });
 
