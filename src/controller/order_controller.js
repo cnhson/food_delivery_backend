@@ -24,6 +24,17 @@ const { getStatusById } = require("../models/status");
 //const { getStoreById } = require("../models/store");
 
 module.exports = {
+  OrderComment: async function (req, res) {
+    try {
+      const account_id = req.body.account_id;
+      const order_id = req.body.order_id;
+      const data = await getUserOrderWithCommentList(account_id, order_id);
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: "Er" });
+    }
+  },
+
   updateStatus: async function (req, res) {
     try {
       const order_id = req.body.order_id;

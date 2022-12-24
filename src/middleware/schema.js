@@ -30,7 +30,7 @@ const store_id = Joi.string().length(10).required();
 const status_id = Joi.string().required();
 
 const order_id = Joi.string().length(10).required();
-const comment = Joi.string().pattern(new RegExp("^[a-zA-Z]{3,2000}$")).required();
+const comment = Joi.string().pattern(new RegExp("^[a-zA-Z_ ]{3,2000}$")).required();
 
 const image = Joi.string().alphanum().required();
 const star = Joi.number().required();
@@ -74,14 +74,16 @@ const schemas = {
     store_id: store_id,
     order_id: order_id,
     comment: comment,
-    image: image,
+    //image: image,
     star: star,
   }),
 
   editComment: Joi.object().keys({
-    comment_id: comment_id,
+    account_id: account_id,
     comment: comment,
-    image: image,
+    store_id: store_id,
+    order_id: order_id,
+    //image: image,
     star: star,
   }),
 

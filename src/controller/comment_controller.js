@@ -1,15 +1,15 @@
-const { insertComment, updateComment, getCommetByIdAndAccount } = require("../models/comment");
+const { insertComment, updateComment, getCommetByIdAndAccount, checkExistComment } = require("../models/comment");
 const { getOrderByAccount } = require("../models/order");
 
 module.exports = {
   createComment: async function (req, res) {
     try {
-      const account_id = Number(req.session.User.id);
-      const store_id = req.body.store_id;
+      const account_id = req.body.account_id;
       const order_id = req.body.order_id;
+      const store_id = req.body.store_id;
+      const star = req.body.star;
       const comment = req.body.comment;
       const image = req.body.image || "";
-      const star = req.body.star;
       // check if account has order before comment
       const check = await getOrderByAccount(account_id, order_id);
 
@@ -21,7 +21,7 @@ module.exports = {
         return;
       } else {
         // Insert comment into database
-        const createAt = new Date().getTime();
+        const createAt = new Date().toISOString();
         const result = await insertComment(store_id, order_id, account_id, comment, image, star, createAt, createAt);
         if (result) {
           res.status(200).json({ message: "Comment added, thanks you again!!" });
@@ -32,24 +32,31 @@ module.exports = {
     }
   },
 
+  checkComment: async function (req, res) {
+    try {
+      const account_id = req.body.account_id;
+      const order_id = req.body.order_id;
+      const store_id = req.body.store_id;
+
+      const data = await checkExistComment(account_id, order_id, store_id);
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).send("Error vai lon");
+    }
+  },
+
   editComment: async function (req, res) {
     try {
-      const account_id = Number(req.session.User.id);
-      const comment_id = Number(req.body.comment_id);
+      const account_id = req.body.account_id;
+      const order_id = req.body.order_id;
+      const store_id = req.body.store_id;
       const comment = req.body.comment;
-      const image = req.body.image || "";
       const star = req.body.star;
-
-      //check if comment id belong to account
-      const check = await getCommetByIdAndAccount(account_id, comment_id);
-      if (check === null || check === undefined) {
-        res.status(500).json({ error: "You are not the owner of this comment" });
-        return;
-      }
+      const image = req.body.image || "";
 
       // Update comment into database
-      const updateAt = new Date().getTime();
-      const result = await updateComment(comment_id, comment, image, star, updateAt);
+      const updateAt = new Date().toISOString();
+      const result = await updateComment(store_id, order_id, account_id, comment, star, updateAt);
 
       if (result) {
         res.status(200).json({ message: "Comment editted!!" });

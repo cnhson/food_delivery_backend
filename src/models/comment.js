@@ -75,20 +75,22 @@ async function insertComment(store_id, order_id, account_id, comment, image, sta
   }
 }
 
-async function updateComment(comment_id, comment, image, star, updated) {
+async function updateComment(store_id, order_id, account_id, comment, star, updated) {
   try {
     await Comment.update(
       {
+        store_id: store_id,
+        order_id: order_id,
+        account_id: account_id,
         comment: comment,
-        image: image,
         star: star,
         updated: updated,
       },
       {
         where: {
-          id: {
-            [Op.eq]: comment_id,
-          },
+          store_id: store_id,
+          order_id: order_id,
+          account_id: account_id,
         },
       }
     );
@@ -136,10 +138,25 @@ async function getCommetByIdAndAccount(account_id, comment_id) {
   });
 }
 
+async function checkExistComment(account_id, order_id, store_id) {
+  try {
+    const data = await Comment.findOne({
+      where: {
+        account_id: account_id,
+        order_id: order_id,
+        store_id: store_id,
+      },
+    });
+    if (data) return true;
+    else return false;
+  } catch (error) {}
+}
+
 module.exports = {
   Comment,
   insertComment,
   updateComment,
   getCommentsListFromStore,
   getCommetByIdAndAccount,
+  checkExistComment,
 };
