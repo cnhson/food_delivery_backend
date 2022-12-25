@@ -182,6 +182,19 @@ async function getMostOrderedProductsDesc() {
   }
 }
 
+async function getProductsBySearch(name) {
+  try {
+    const data = await sequelize.query("select id, name, image from menu where name like '%" + name + "%'", {
+      type: QueryTypes.SELECT,
+    });
+
+    return data;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
+
 async function getProductDetail(id) {
   try {
     //Filter product info
@@ -222,6 +235,7 @@ async function getProductDetail(id) {
 
 module.exports = {
   Menu,
+  getProductsBySearch,
   getAllProduct,
   getProductById,
   addProduct,

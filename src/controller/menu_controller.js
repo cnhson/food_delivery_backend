@@ -1,4 +1,5 @@
 const {
+  getProductsBySearch,
   getAllProduct,
   getProductById,
   addProduct,
@@ -19,6 +20,20 @@ const {
 const { getStoreById } = require("../models/store");
 
 module.exports = {
+  searchProduct: async function (req, res) {
+    try {
+      const name = req.body.name;
+      const data = await getProductsBySearch(name);
+      if (data) {
+        res.status(200).json(data);
+      }
+    } catch (error) {
+      {
+        res.status(500).json(error);
+      }
+    }
+  },
+
   test: async function (req, res) {
     const oid = req.params.oid;
     console.log(oid);

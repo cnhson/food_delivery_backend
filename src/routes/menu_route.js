@@ -5,6 +5,7 @@ const schemas = require("../middleware/schema");
 const { PROPERTY_TYPE } = require("../services/constant");
 
 router.get("/get-all-products", menu.getPopularProductsDesc);
+router.post("/search", menu.searchProduct);
 router.route("/get-all-products/:storeId").get(middleware(schemas.storeId, PROPERTY_TYPE.params), menu.getAllProducts);
 router.route("/get-product/:product_id").get(middleware(schemas.product_id, PROPERTY_TYPE.params), menu.getProduct);
 router.route("/product/:id").get(menu.productInfo);
