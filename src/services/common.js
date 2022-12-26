@@ -14,7 +14,11 @@ const sequelize = new Sequelize(db_config.database, db_config.user, db_config.pa
   define: {
     freezeTableName: true,
   },
-
+  dialectOptions: {
+    ssl: {
+      rejectUnauthorized: true,
+    },
+  },
   timezone: "+07:00",
 });
 
