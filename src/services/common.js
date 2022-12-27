@@ -16,7 +16,8 @@ const sequelize = new Sequelize(db_config.database, db_config.user, db_config.pa
   },
   dialectOptions: {
     ssl: {
-      rejectUnauthorized: true,
+      require: true,
+      rejectUnauthorized: false,
     },
   },
   timezone: "+07:00",

@@ -11,7 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 3307;
 const HOST = process.env.SERVER_HOST || "127.0.0.1";
 // Specific domain
-const allowedOrigins = JSON.parse(process.env.ALLOW_ORIGINS);
+// const allowedOrigins = JSON.parse(process.env.ALLOW_ORIGINS);
 
 require("./models");
 
@@ -33,10 +33,10 @@ app.use(function (req, res, next) {
   // All domain
   // res.header("Access-Control-Allow-Origin", "*");
 
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-  }
+  // const origin = req.headers.origin;
+  // if (allowedOrigins.includes(origin)) {
+  //   res.setHeader("Access-Control-Allow-Origin", origin);
+  // }
 
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
