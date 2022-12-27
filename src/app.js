@@ -54,5 +54,6 @@ app.use(routes);
 //cron.start();
 
 app.listen(PORT, HOST, () => {
+  console.log("TEST ", process.env.HOST, process.env.DB_USER, process.env.PASSWORD, process.env.DATABASE_NAME);
   console.log(`Server is running on port: ${PORT} ${HOST}`);
 });
