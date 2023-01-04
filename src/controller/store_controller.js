@@ -1,5 +1,5 @@
 const { insertStore, getStoreById, getUserStore, updateStoreById, getAll } = require("../models/store");
-const { getCommentsListFromStore } = require("../models/comment");
+const { getCommentsListFromStore, getProductListWithOrderId } = require("../models/comment");
 const { checkNewOrders } = require("../models/order");
 const { getProductByStore } = require("../models/menu");
 const { getAllType } = require("../models/store_type");
@@ -123,6 +123,9 @@ module.exports = {
         return;
       } else {
         let comments = await getCommentsListFromStore(store_id);
+        const order_id = comments[0].order_id;
+        const productlist = await getProductListWithOrderId(order_id, store_id);
+        comments[0]["products"] = productlist;
         res.status(200).json(comments);
       }
     } catch (err) {

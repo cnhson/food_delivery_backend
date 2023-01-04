@@ -104,7 +104,7 @@ async function updateComment(store_id, order_id, account_id, comment, star, upda
 async function getCommentsListFromStore(store_id) {
   try {
     const data = await sequelize.query(
-      "SELECT id , (select name from account a where a.id = c.account_id) 'name' " +
+      "SELECT id , order_id, (select name from account a where a.id = c.account_id) 'name' " +
         ", comment, star, timestamp, updated FROM food_delivery.comment c where c.store_id = '" +
         store_id +
         "'",
@@ -115,6 +115,25 @@ async function getCommentsListFromStore(store_id) {
     return data;
   } catch (err) {
     console.log(err);
+    return null;
+  }
+}
+
+async function getProductListWithOrderId(order_id, store_id) {
+  try {
+    const data = await sequelize.query(
+      "select product_id,(select name from menu m where od.product_id = m.id) 'name' from order_detail od where order_id = '" +
+        order_id +
+        "' and store_id = '" +
+        store_id +
+        "'",
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+    return data;
+  } catch (error) {
+    console.log(error);
     return null;
   }
 }
@@ -158,5 +177,6 @@ module.exports = {
   updateComment,
   getCommentsListFromStore,
   getCommetByIdAndAccount,
+  getProductListWithOrderId,
   checkExistComment,
 };
