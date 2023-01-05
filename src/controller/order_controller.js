@@ -13,6 +13,7 @@ const {
   proceedOrderDetail,
   progressOrder,
   getRangeOrdersByStatusOfUser,
+  getOrderReceivedStateByOrderId,
 } = require("../models/order");
 const { insertOrderDetail, getOrderDetailById, getTotalPriceByOrderId } = require("../models/order_detail");
 const crypto = require("crypto");
@@ -24,6 +25,16 @@ const { getStatusById } = require("../models/status");
 //const { getStoreById } = require("../models/store");
 
 module.exports = {
+  getOrderReceivedState: async function (req, res) {
+    try {
+      const order_id = req.body.order_id;
+      const data = await getOrderReceivedStateByOrderId(order_id);
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: "Error" });
+    }
+  },
+
   OrderComment: async function (req, res) {
     try {
       const account_id = req.body.account_id;
@@ -31,7 +42,7 @@ module.exports = {
       const data = await getUserOrderWithCommentList(account_id, order_id);
       res.status(200).json(data);
     } catch (error) {
-      res.status(500).json({ error: "Er" });
+      res.status(500).json({ error: "Error" });
     }
   },
 

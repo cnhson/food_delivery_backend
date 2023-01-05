@@ -6,6 +6,7 @@ const { PROPERTY_TYPE } = require("../services/constant");
 
 router.route("/get-history/").get(middleware(schemas.getAccountOrders, PROPERTY_TYPE.query), order.getHistory);
 router.post("/get-comment", order.OrderComment);
+router.post("/state", order.getOrderReceivedState);
 
 router.route("/create").post(middleware(schemas.createOrder, PROPERTY_TYPE.body), order.createOrder);
 router.route("/profit").get(middleware(schemas.profitPerDay, PROPERTY_TYPE.body), order.profitPerDate);

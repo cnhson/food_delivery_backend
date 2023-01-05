@@ -12,6 +12,9 @@ const name = Joi.string()
   .min(3)
   .max(255)
   .regex(/^\s*\w+(?:[^\w,]+\w+)*[^,\w]*$/);
+const productypename = Joi.string()
+  .required()
+  .regex(/^[a-z]+(?:\s[a-z]+)?$/);
 const address = name;
 const description = name;
 
@@ -98,7 +101,7 @@ const schemas = {
 
   createProductType: Joi.object().keys({
     id: product_type_id,
-    name: name,
+    name: productypename,
     store_id: store_id,
   }),
 

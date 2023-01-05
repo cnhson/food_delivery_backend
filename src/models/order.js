@@ -334,6 +334,23 @@ async function calculateTotalPerDayWithLimit(store_id, limit) {
   }
 }
 
+async function getOrderReceivedStateByOrderId(order_id) {
+  try {
+    const data = await sequelize.query(
+      "SELECT (select name from menu m where m.id = od.product_id) 'name', quantity, " +
+        "(select name from store s where s.id = od.store_id) 'store', proceed FROM food_delivery.order_detail od where order_id = '" +
+        order_id +
+        "'",
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+    return data;
+  } catch (err) {
+    console.log(err);
+    return 0;
+  }
+}
 // async function calculateTotalPerDayWithLimit(store_id, limit, skip) {
 //   try {
 //     const data = await sequelize.query(
@@ -358,6 +375,7 @@ async function calculateTotalPerDayWithLimit(store_id, limit) {
 
 module.exports = {
   Order,
+  getOrderReceivedStateByOrderId,
   insertOrder,
   progressOrder,
   proceedOrderDetail,
