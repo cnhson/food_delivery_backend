@@ -182,6 +182,32 @@ async function getMostOrderedProductsDesc() {
   }
 }
 
+async function getRandomProductInStore(store_id, product_id) {
+  try {
+    // pid={item.id}
+    // description={item.description}
+    // type={item.type_name}
+    // name={item.name}
+    // image={item.image}
+    // price={item.price}
+    const data = await sequelize.query(
+      "SELECT id, description, (select name from product_type pt where pt.id = m.type_id) 'type_name',name,image,price FROM food_delivery.menu m where id <> " +
+        product_id +
+        " and store_id = '" +
+        store_id +
+        "' order by rand() limit 4 ",
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    return data;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
+
 async function getProductsBySearch(name) {
   try {
     const data = await sequelize.query("select id, name, image from menu where name like '%" + name + "%'", {
@@ -235,6 +261,7 @@ async function getProductDetail(id) {
 
 module.exports = {
   Menu,
+  getRandomProductInStore,
   getProductsBySearch,
   getAllProduct,
   getProductById,

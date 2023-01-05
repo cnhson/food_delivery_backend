@@ -8,6 +8,7 @@ const {
   getProductByStore,
   getProductByIdAndStoreId,
   getMostOrderedProductsDesc,
+  getRandomProductInStore,
 } = require("../models/menu");
 
 const {
@@ -135,6 +136,19 @@ module.exports = {
       res.status(200).json(data);
     } catch (err) {
       console.log(err);
+      res.status(500).send(err);
+    }
+  },
+
+  getRandomProducts: async function (req, res) {
+    try {
+      const store_id = req.body.store_id;
+      const product_id = req.body.product_id;
+      const data = await getRandomProductInStore(store_id, product_id);
+      if (data) {
+        res.status(200).json(data);
+      }
+    } catch (error) {
       res.status(500).send(err);
     }
   },
