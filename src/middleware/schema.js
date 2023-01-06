@@ -200,7 +200,7 @@ const schemas = {
   }),
   getStoreOrders: Joi.object().keys({
     store_id: store_id,
-    status_id: status_id,
+    //status_id: status_id,
     page: page,
     size: size,
   }),
