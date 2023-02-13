@@ -72,6 +72,25 @@ async function insertOrderDetail(order_id, product_id, quantity, store_id, price
   }
 }
 
+async function getProductListWithOrderId(order_id, store_id) {
+  try {
+    const data = await sequelize.query(
+      "select product_id,(select name from menu m where od.product_id = m.id) 'name' from order_detail od where order_id = '" +
+        order_id +
+        "' and store_id = '" +
+        store_id +
+        "'",
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+    return data;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}
+
 async function getOrderDetailById(order_id) {
   return await sequelize.query(
     "select product_id, " +
@@ -95,4 +114,69 @@ async function getTotalPriceByOrderId(order_id) {
   if (data) return data[0].total;
 }
 
-module.exports = { orderDetail, insertOrderDetail, getOrderDetailById, getTotalPriceByOrderId };
+async function checkproceedOrderDetail(order_id, product_id, store_id) {
+  try {
+    const data = await sequelize.query(
+      "select proceed from food_delivery.order_detail where order_id = '" +
+        order_id +
+        "' and product_id = '" +
+        product_id +
+        "' and store_id ='" +
+        store_id +
+        "'",
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+    return data[0].proceed;
+  } catch (error) {
+    return error;
+  }
+}
+
+async function proceedOrderDetail(order_id, product_id, store_id) {
+  try {
+    await orderDetail.update(
+      { proceed: 1 },
+      {
+        where: {
+          order_id: order_id,
+          product_id: product_id,
+          store_id: store_id,
+        },
+      }
+    );
+    return true;
+  } catch (error) {
+    return error;
+  }
+}
+
+// async function deproceedOrderDetail(order_id, store_id, product_id) {
+//   try {
+//     await orderDetail.update(
+//       { proceed: 0 },
+//       {
+//         where: {
+//           order_id: order_id,
+//           product_id: product_id,
+//           store_id: store_id,
+//         },
+//       }
+//     );
+//     return true;
+//   } catch (error) {
+//     return false;
+//   }
+// }
+
+module.exports = {
+  orderDetail,
+  insertOrderDetail,
+  checkproceedOrderDetail,
+  proceedOrderDetail,
+  //deproceedOrderDetail,
+  getOrderDetailById,
+  getTotalPriceByOrderId,
+  getProductListWithOrderId,
+};

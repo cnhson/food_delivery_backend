@@ -1,7 +1,7 @@
 const { insertStore, getStoreById, getUserStore, updateStoreById, getAll } = require("../models/store");
-const { getCommentsListFromStore, getProductListWithOrderId } = require("../models/comment");
-const { checkNewOrders } = require("../models/order");
-const { getProductByStore } = require("../models/menu");
+const { getCommentsListFromStore } = require("../models/comment");
+const { getProductListWithOrderId } = require("../models/order_detail");
+const { getProductsByStore } = require("../models/menu");
 const { getAllType } = require("../models/store_type");
 module.exports = {
   getAllStores: async function (req, res) {
@@ -12,24 +12,6 @@ module.exports = {
       }
     } catch (err) {
       res.status(500).json(err);
-    }
-  },
-
-  getNewOrders: async function (req, res) {
-    try {
-      const store_id = req.body.store_id;
-
-      if (store_id != null) {
-        const neworders = await checkNewOrders(store_id);
-
-        if (neworders) {
-          res.status(200).json({ neworders });
-        }
-      } else {
-        res.status(500).json("Store ID not found");
-      }
-    } catch (err) {
-      res.status(500).send(err);
     }
   },
 
@@ -61,7 +43,7 @@ module.exports = {
       console.log(sid);
       if (sid != null) {
         const store = await getStoreById(sid);
-        const products = await getProductByStore(sid);
+        const products = await getProductsByStore(sid);
         //console.log([f_store, f_products]);
         if (store && products) {
           res.status(200).json({ store, products });

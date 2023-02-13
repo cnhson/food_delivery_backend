@@ -119,25 +119,6 @@ async function getCommentsListFromStore(store_id) {
   }
 }
 
-async function getProductListWithOrderId(order_id, store_id) {
-  try {
-    const data = await sequelize.query(
-      "select product_id,(select name from menu m where od.product_id = m.id) 'name' from order_detail od where order_id = '" +
-        order_id +
-        "' and store_id = '" +
-        store_id +
-        "'",
-      {
-        type: QueryTypes.SELECT,
-      }
-    );
-    return data;
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
-}
-
 async function getCommetByIdAndAccount(account_id, comment_id) {
   return await Comment.findAll({
     where: {
@@ -177,6 +158,5 @@ module.exports = {
   updateComment,
   getCommentsListFromStore,
   getCommetByIdAndAccount,
-  getProductListWithOrderId,
   checkExistComment,
 };

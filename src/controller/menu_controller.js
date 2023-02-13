@@ -5,7 +5,7 @@ const {
   addProduct,
   getProductDetail,
   updateProductById,
-  getProductByStore,
+  getProductsByStore,
   getProductByIdAndStoreId,
   getMostOrderedProductsDesc,
   getRandomProductInStore,
@@ -156,7 +156,7 @@ module.exports = {
   getAllProducts: async function (req, res) {
     const storeId = req.params.storeId;
     try {
-      const data = await getProductByStore(storeId);
+      const data = await getProductsByStore(storeId);
       if (data.length === 0) {
         res.status(200).json(data);
         return;

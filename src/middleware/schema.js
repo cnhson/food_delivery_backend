@@ -150,7 +150,7 @@ const schemas = {
     limit: Joi.number().required(),
   }),
 
-  updateOrder: Joi.object().keys({
+  changeOrderStatus: Joi.object().keys({
     order_id: order_id,
     account_id: account_id,
     status_id: status_id,
@@ -180,10 +180,6 @@ const schemas = {
     userId: owner_id,
   }),
   storeId: Joi.object().keys({
-    storeId: store_id,
-  }),
-
-  getNewOrders: Joi.object().keys({
     storeId: store_id,
   }),
 

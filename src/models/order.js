@@ -1,6 +1,5 @@
 const { sequelize } = require("../services/common");
-const { DataTypes, Op, QueryTypes, Sequelize } = require("sequelize");
-const { orderDetail } = require("./order_detail");
+const { DataTypes, Op, QueryTypes } = require("sequelize");
 const { query } = require("express");
 
 const Order = sequelize.define(
@@ -111,45 +110,7 @@ async function getTotalOrdersByStatusOfUser(user_id, status_id) {
   return total[0].total_count;
 }
 
-async function checkproceedOrderDetail(order_id, product_id, store_id) {
-  try {
-    const data = await sequelize.query(
-      "select proceed from food_delivery.order_detail where order_id = '" +
-        order_id +
-        "' and product_id = '" +
-        product_id +
-        "' and store_id ='" +
-        store_id +
-        "'",
-      {
-        type: QueryTypes.SELECT,
-      }
-    );
-    return data[0].proceed;
-  } catch (error) {
-    return error;
-  }
-}
-
-async function proceedOrderDetail(order_id, product_id, store_id) {
-  try {
-    await orderDetail.update(
-      { proceed: 1 },
-      {
-        where: {
-          order_id: order_id,
-          product_id: product_id,
-          store_id: store_id,
-        },
-      }
-    );
-    return true;
-  } catch (error) {
-    return error;
-  }
-}
-
-async function progressOrder(order_id) {
+async function increaseOrderProgress(order_id) {
   try {
     await sequelize.query("update food_delivery.order set progress = progress + 1 where id = '" + order_id + "'", {
       type: QueryTypes.UPDATE,
@@ -160,48 +121,30 @@ async function progressOrder(order_id) {
   }
 }
 
-async function checkProgressAndSetOrderStatus(order_id) {
+async function getOrderProgress(order_id) {
   try {
-    const equal = await sequelize.query(
-      "select progress = product_count as 'is_true' from food_delivery.order where id = '" + order_id + "'",
-      {
-        type: QueryTypes.SELECT,
-      }
-    );
-
-    if (equal[0].is_true === 1) {
-      await sequelize.query("update food_delivery.order set status = 'SHP' where id = '" + order_id + "'", {
-        type: QueryTypes.SELECT,
-      });
-      return true;
-    } else {
-      await sequelize.query("update food_delivery.order set status = 'RCD' where id = '" + order_id + "'", {
-        type: QueryTypes.SELECT,
-      });
-      return true;
-    }
+    const progress = await sequelize.query("select progress from food_delivery.order where id = '" + order_id + "'", {
+      type: QueryTypes.SELECT,
+    });
+    return progress[0].progress;
   } catch (error) {
     return error;
   }
 }
 
-// async function deproceedOrderDetail(order_id, store_id, product_id) {
-//   try {
-//     await orderDetail.update(
-//       { proceed: 0 },
-//       {
-//         where: {
-//           order_id: order_id,
-//           product_id: product_id,
-//           store_id: store_id,
-//         },
-//       }
-//     );
-//     return true;
-//   } catch (error) {
-//     return false;
-//   }
-// }
+async function getOrderProductCount(order_id) {
+  try {
+    const productcount = await sequelize.query(
+      "select product_count from food_delivery.order where id = '" + order_id + "'",
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+    return productcount[0].product_count;
+  } catch (error) {
+    return error;
+  }
+}
 
 async function getTotalOrdersByStatus(store_id, status_id) {
   const total = await sequelize.query(
@@ -283,7 +226,7 @@ async function getUserOrderWithCommentList(account_id, order_id) {
         type: QueryTypes.SELECT,
       }
     );
-    console.log(data);
+    //console.log(data);
     return data;
   } catch (err) {
     console.log(err);
@@ -299,13 +242,14 @@ async function updateStatus(id, status_id) {
       },
       {
         where: {
-          id: {
-            [Op.eq]: id,
-          },
+          // id: {
+          //   [Op.eq]: id,
+          // },
+
+          id: id,
         },
       }
     );
-
     return true;
   } catch (err) {
     console.log(err);
@@ -375,20 +319,18 @@ async function getOrderReceivedStateByOrderId(order_id) {
 
 module.exports = {
   Order,
-  getOrderReceivedStateByOrderId,
+  updateStatus,
   insertOrder,
-  progressOrder,
-  proceedOrderDetail,
-  checkproceedOrderDetail,
-  checkProgressAndSetOrderStatus,
-  //deproceedOrderDetail,
+  increaseOrderProgress,
+  getOrderById,
+  getOrderProgress,
+  getOrderProductCount,
+  getOrderReceivedStateByOrderId,
   getOrderByAccount,
   getUserOrderWithCommentList,
-  updateStatus,
-  //calculateTotalPerDayWithLimit,
+  getTotalOrdersByStatusOfUser,
   getTotalOrdersByStatus,
   getRangeOrdersByStatus,
-  getOrderById,
   getRangeOrdersByStatusOfUser,
-  getTotalOrdersByStatusOfUser,
+  //calculateTotalPerDayWithLimit,
 };

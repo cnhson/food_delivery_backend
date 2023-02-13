@@ -21,7 +21,7 @@
     "moment": "^2.29.4",
     "mysql": "^2.18.1",
     "mysql2": "^2.3.3",
-    "sequelize": "^6.25.8"
+    "sequelize": "^6.28.0"
   },
   "devDependencies": {
     "eslint": "^8.24.0",

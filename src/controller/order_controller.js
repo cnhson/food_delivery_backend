@@ -8,14 +8,19 @@ const {
   getOrderByAccount,
   getOrderById,
   getTotalOrdersByStatusOfUser,
-  checkProgressAndSetOrderStatus,
-  checkproceedOrderDetail,
-  proceedOrderDetail,
-  progressOrder,
+  getOrderProgress,
+  getOrderProductCount,
+  increaseOrderProgress,
   getRangeOrdersByStatusOfUser,
   getOrderReceivedStateByOrderId,
 } = require("../models/order");
-const { insertOrderDetail, getOrderDetailById, getTotalPriceByOrderId } = require("../models/order_detail");
+const {
+  insertOrderDetail,
+  getOrderDetailById,
+  getTotalPriceByOrderId,
+  checkproceedOrderDetail,
+  proceedOrderDetail,
+} = require("../models/order_detail");
 const crypto = require("crypto");
 const { getAccountByIdAndRole } = require("../models/account");
 const { pagination, checkNextAndPreviousPage } = require("../services/common");
@@ -46,7 +51,7 @@ module.exports = {
     }
   },
 
-  updateStatus: async function (req, res) {
+  changeOrderStatus: async function (req, res) {
     try {
       const order_id = req.body.order_id;
       const account_id = req.body.account_id;
@@ -56,16 +61,18 @@ module.exports = {
       const check = await getAccountByIdAndRole(account_id, "SEL");
       const checkCus = await getOrderByAccount(account_id, order_id);
       if (check.length === 0 && checkCus.length === 0) {
-        res.status(500).json({ error: "You do not have permission to update the status of this order" });
+        res.status(500).json({
+          error: "You do not have permission to update the status of this order",
+        });
         return;
       } else {
         // check if this order is accepted or not
         if (checkCus.length > 0) {
           const status = checkCus[0].status;
           if (status !== "NRY") {
-            res
-              .status(500)
-              .json({ error: "This order cannot be canceled because the store owner has already accepted it" });
+            res.status(500).json({
+              error: "This order cannot be canceled because the store owner has already accepted it",
+            });
             return;
           }
         }
@@ -75,7 +82,9 @@ module.exports = {
           res.status(200).json({ message: "Update status successfully!" });
           return;
         }
-        res.status(500).json({ error: "Update status failed or this order does not exists" });
+        res.status(500).json({
+          error: "Update status failed or this order does not exists",
+        });
         return;
       }
     } catch (err) {
@@ -92,16 +101,27 @@ module.exports = {
 
       const check = await checkproceedOrderDetail(order_id, product_id, store_id);
       if (check === 1) {
-        checkProgressAndSetOrderStatus(order_id);
         res.status(200).json({ error: "Already proceeded" });
       } else {
         const proceed = await proceedOrderDetail(order_id, product_id, store_id);
         if (proceed) {
-          const progress = await progressOrder(order_id);
-          if (progress) {
-            checkProgressAndSetOrderStatus(order_id);
+          const increase_progress = await increaseOrderProgress(order_id);
+          if (increase_progress) {
             res.status(200).json({ message: "Order proceeding" });
           }
+        }
+      }
+      const progress = await getOrderProgress(order_id);
+      const productcount = await getOrderProductCount(order_id);
+
+      //check order's current total accepted (progress) with condition amount (productcount)
+      if (progress == 0) {
+        await updateStatus(order_id, "NRY");
+      } else {
+        if (progress == productcount) {
+          await updateStatus(order_id, "SHP");
+        } else {
+          await updateStatus(order_id, "RCD");
         }
       }
     } catch (err) {
