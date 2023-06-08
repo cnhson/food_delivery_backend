@@ -40,7 +40,7 @@ const Store = sequelize.define(
     active_date: {
       type: DataTypes.STRING(25),
     },
-    timestamp: {
+    created_date: {
       type: DataTypes.STRING(25),
     },
   },
@@ -49,7 +49,7 @@ const Store = sequelize.define(
   }
 );
 
-async function insertStore(id, owner_id, name, address, description, image, type_id, timestamp) {
+async function insertStore(id, owner_id, name, address, description, image, type_id, created_date) {
   try {
     await Store.create({
       id: id,
@@ -59,8 +59,8 @@ async function insertStore(id, owner_id, name, address, description, image, type
       description: description,
       image: image,
       type_id: type_id,
-      active_date: timestamp,
-      timestamp: timestamp,
+      active_date: created_date,
+      created_date: created_date,
     });
 
     return true;
@@ -70,7 +70,7 @@ async function insertStore(id, owner_id, name, address, description, image, type
   }
 }
 
-async function updateStoreById(id, owner_id, name, address, description, type_id, timestamp) {
+async function updateStoreById(id, owner_id, name, address, description, type_id, created_date) {
   try {
     const data = await Store.update(
       {
@@ -78,7 +78,7 @@ async function updateStoreById(id, owner_id, name, address, description, type_id
         address,
         description,
         type_id,
-        timestamp,
+        created_date,
       },
       {
         where: {

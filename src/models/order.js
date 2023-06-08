@@ -25,7 +25,7 @@ const Order = sequelize.define(
       type: DataTypes.STRING(50),
       allowNull: false,
     },
-    timestamp: {
+    created_date: {
       type: DataTypes.STRING(25),
       allowNull: false,
     },
@@ -56,7 +56,7 @@ const Order = sequelize.define(
   }
 );
 
-async function insertOrder(order_id, account_id, address, ship_fee, payment_method, product_count, timestamp) {
+async function insertOrder(order_id, account_id, address, ship_fee, payment_method, product_count, created_date) {
   try {
     await Order.create({
       id: order_id,
@@ -66,7 +66,7 @@ async function insertOrder(order_id, account_id, address, ship_fee, payment_meth
       payment_method: payment_method,
       product_count: product_count,
       status: "NRY",
-      timestamp: timestamp,
+      created_date: created_date,
       progress: 0,
     });
 
@@ -162,13 +162,13 @@ async function getTotalOrdersByStatus(store_id, status_id) {
 
 async function getRangeOrdersByStatus(start, size, store_id, status_id) {
   const data = await sequelize.query(
-    "SELECT o.id, (select email from account a where a.id = o.account_id) 'email', timestamp, payment_method, product_id, " +
+    "SELECT o.id, (select email from account a where a.id = o.account_id) 'email', created_date, payment_method, product_id, " +
       "(select name from menu m where m.id = product_id) 'product', " +
-      "(select name from status s where s.id = o.status) 'status', progress, proceed " +
+      "(select name from status s where s.id = o.status) 'status', progress, proceed, od.quantity " +
       "FROM food_delivery.order o inner join order_detail od on o.id = od.order_id " +
       "where store_id = '" +
       store_id +
-      "' order by timestamp DESC limit " +
+      "' order by created_date DESC limit " +
       size +
       " offset " +
       start,
@@ -195,7 +195,7 @@ async function getRangeOrdersByStatusOfUser(start, size, user_id, status_id) {
         },
       ],
     },
-    order: [["timestamp", "DESC"]],
+    order: [["created_date", "DESC"]],
     offset: start,
     limit: size,
   });
@@ -204,7 +204,7 @@ async function getRangeOrdersByStatusOfUser(start, size, user_id, status_id) {
 async function getOrderById(order_id) {
   return await Order.findAll({
     raw: true,
-    attributes: ["id", "address", "ship_fee", "timestamp", "payment_method"],
+    attributes: ["id", "address", "ship_fee", "created_date", "payment_method"],
     where: {
       id: {
         [Op.eq]: order_id,
@@ -216,7 +216,7 @@ async function getOrderById(order_id) {
 async function getUserOrderWithCommentList(account_id, order_id) {
   try {
     const data = await sequelize.query(
-      "select store_id, (select name from store s where c.store_id = s.id) 'store_name',comment, star, timestamp, updated from food_delivery.comment c where order_id='" +
+      "select store_id, (select name from store s where c.store_id = s.id) 'store_name',comment, star, created_date, updated_date from food_delivery.comment c where order_id='" +
         order_id +
         "'" +
         "and account_id = '" +
@@ -260,7 +260,7 @@ async function updateStatus(id, status_id) {
 async function calculateTotalPerDayWithLimit(store_id, limit) {
   try {
     const data = await sequelize.query(
-      "SELECT Round(UNIX_TIMESTAMP(FROM_UNIXTIME(ord.timestamp/1000, '%Y-%m-%d'))*1000) 'otimestamp'," +
+      "SELECT Round(UNIX_TIMESTAMP(FROM_UNIXTIME(ord.created_date/1000, '%Y-%m-%d'))*1000) 'otimestamp'," +
         " SUM(price + ship_fee * quantity ) 'total' FROM food_delivery.order ord " +
         "inner join order_detail od on ord.id = od.order_id " +
         "where store_id = '" +
@@ -298,7 +298,7 @@ async function getOrderReceivedStateByOrderId(order_id) {
 // async function calculateTotalPerDayWithLimit(store_id, limit, skip) {
 //   try {
 //     const data = await sequelize.query(
-//       "SELECT FROM_UNIXTIME(ord.timestamp/1000, '%Y-%m-%d') 'only_date', SUM(price + ship_fee * quantity ) 'total' FROM food_delivery.order ord " +
+//       "SELECT FROM_UNIXTIME(ord.created_date/1000, '%Y-%m-%d') 'only_date', SUM(price + ship_fee * quantity ) 'total' FROM food_delivery.order ord " +
 //         "inner join order_detail od on ord.id = od.order_id " +
 //         "where store_id = '" +
 //         store_id +

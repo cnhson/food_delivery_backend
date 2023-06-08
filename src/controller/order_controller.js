@@ -140,7 +140,7 @@ module.exports = {
       const limit = req.body.limit;
       const data = await calculateTotalPerDayWithLimit(store_id, limit);
 
-      //Change to array[[timestamp,total]]
+      //Change to array[[created_date,total]]
       let arraydata = [];
 
       for (const index in data) {
@@ -161,7 +161,7 @@ module.exports = {
       const product_count = req.body.product_count;
       const ship_fee = req.body.ship_fee;
       const address = req.body.address;
-      const timestamp = req.body.timestamp;
+      const created_date = req.body.created_date;
 
       //check if account exists
       const check = await getAccountByIdAndRole(account_id, "CUS");
@@ -179,7 +179,7 @@ module.exports = {
         ship_fee,
         payment_method,
         product_count,
-        timestamp
+        created_date
       );
       if (!order) {
         res.status(500).json({ error: "Create order failed!" });
@@ -247,6 +247,8 @@ module.exports = {
     const page = Number(req.query.page);
     const size = Number(req.query.size);
 
+    console.log(store_id, status_id, page, size);
+
     try {
       const data = pagination;
       data.currentPage = page;
@@ -269,14 +271,6 @@ module.exports = {
       const start = Number(size * (page - 1));
       const items = await getRangeOrdersByStatus(start, size, store_id, status_id);
 
-      // get email by account id and status by status id
-      // for (let i = 0; i < items.length; i++) {
-      //   const email = await getAccountByIdAndRole(items[i].account_id, "CUS");
-      //   delete items[i].dataValues.account_id;
-      //   items[i].dataValues.email = email[0].email;
-      //   const status = await getStatusById(items[i].status);
-      //   items[i].dataValues.status = status[0].name;
-      // }
       data.items = items;
 
       res.status(200).json(data);
@@ -304,7 +298,7 @@ module.exports = {
         // totalprice: totalprice,
         address: order[0].address,
         ship_fee: order[0].ship_fee,
-        // timestamp: order[0].timestamp,
+        // created_date: order[0].created_date,
         // payment_method: order[0].payment_method,
         order_detail: orderdetail,
       };

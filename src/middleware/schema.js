@@ -44,7 +44,7 @@ const quantity = Joi.number().required();
 const ship_fee = Joi.string().max(25).required();
 
 const payment_method = Joi.string().alphanum().required();
-const timestamp = Joi.string().required();
+const created_date = Joi.string().required();
 const out_of_stock = Joi.number().valid(0, 1).required();
 
 const del_flag = Joi.number().valid(0, 1).required();
@@ -63,7 +63,7 @@ const schemas = {
     email: email,
     password: password,
     repeatPassword: Joi.any().valid(Joi.ref("password")),
-    timestamp: timestamp,
+    created_date: created_date,
   }),
 
   loginAccount: Joi.object().keys({
@@ -142,7 +142,7 @@ const schemas = {
     product_count: Joi.number().required(),
     payment_method: payment_method,
     ship_fee: ship_fee,
-    timestamp: timestamp,
+    created_date: created_date,
   }),
 
   profitPerDay: Joi.object().keys({
@@ -164,7 +164,7 @@ const schemas = {
     description: description,
     image: image,
     type_id: store_type,
-    timestamp: timestamp,
+    created_date: created_date,
   }),
 
   editStore: Joi.object().keys({
@@ -174,7 +174,7 @@ const schemas = {
     address: address,
     description: description,
     type_id: type_id,
-    timestamp: timestamp,
+    created_date: created_date,
   }),
   userId: Joi.object().keys({
     userId: owner_id,

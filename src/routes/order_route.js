@@ -10,7 +10,9 @@ router.post("/state", order.getOrderReceivedState);
 
 router.route("/create").post(middleware(schemas.createOrder, PROPERTY_TYPE.body), order.createOrder);
 router.route("/profit").get(middleware(schemas.profitPerDay, PROPERTY_TYPE.body), order.profitPerDate);
-router.route("/proceed").post(middleware(schemas.proceedOrderWithStore, PROPERTY_TYPE.body), order.proceedOrderWithStore);
+router
+  .route("/proceed")
+  .post(middleware(schemas.proceedOrderWithStore, PROPERTY_TYPE.body), order.proceedOrderWithStore);
 
 /*
     api used to update status of order if store owner call this api
@@ -18,8 +20,8 @@ router.route("/proceed").post(middleware(schemas.proceedOrderWithStore, PROPERTY
     owner accept order
 */
 router.route("/status-change").post(middleware(schemas.changeOrderStatus, PROPERTY_TYPE.body), order.changeOrderStatus);
-router.route("/get-store-orders").get(middleware(schemas.getStoreOrders, PROPERTY_TYPE.query), order.getStoreOrders);
-router.route("/get-order/:order_id").get(middleware(schemas.OrderId, PROPERTY_TYPE.params), order.getOrderDetail);
+router.route("/get-store-orders").post(middleware(schemas.getStoreOrders, PROPERTY_TYPE.query), order.getStoreOrders);
+router.route("/get-order/:order_id").post(middleware(schemas.OrderId, PROPERTY_TYPE.params), order.getOrderDetail);
 
 //test
 router.get("/test", order.test);

@@ -1,6 +1,5 @@
 const { insertAccount, getAccountByEmailAndRole, getAccountById } = require("../models/account");
 const bcrypt = require("bcryptjs");
-const session = require("express-session");
 const { getUserStore } = require("../models/store");
 
 module.exports = {
@@ -20,7 +19,7 @@ module.exports = {
       const name = req.body.name;
       const email = req.body.email;
       const password = req.body.password;
-      const timestamp = req.body.timestamp;
+      const created_date = req.body.created_date;
       let hashedPassword = "";
 
       // Hash password
@@ -33,7 +32,7 @@ module.exports = {
 
           hashedPassword = hash;
           // Insert account into database
-          const result = await insertAccount(id, role_id, name, email, hashedPassword, timestamp);
+          const result = await insertAccount(id, role_id, name, email, hashedPassword, created_date);
 
           if (result) {
             res.status(200).json({ message: "Register successfully" });
@@ -52,7 +51,6 @@ module.exports = {
       const email = req.body.email;
       const password = req.body.password;
       const role_id = req.body.role_id;
-
       // Check if given account is exists
       let account = await getAccountByEmailAndRole(email, role_id);
       if (account === null) {
@@ -60,14 +58,12 @@ module.exports = {
         return;
       }
       account = account[0];
-      //console.log(account.password);
       const hashedPassword = account.password;
       bcrypt.compare(password, hashedPassword, async function (err, isMatch) {
         if (err) {
           res.status(404).json({ error: err });
           return;
         }
-
         if (!isMatch) {
           res.status(404).json({ error: "Password is incorrect" });
           return;

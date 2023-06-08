@@ -42,10 +42,10 @@ const Comment = sequelize.define(
     star: {
       type: DataTypes.INTEGER,
     },
-    timestamp: {
+    created_date: {
       type: DataTypes.STRING(25),
     },
-    updated: {
+    updated_date: {
       type: DataTypes.STRING(25),
     },
   },
@@ -56,7 +56,7 @@ const Comment = sequelize.define(
   }
 );
 
-async function insertComment(store_id, order_id, account_id, comment, image, star, timestamp, updated) {
+async function insertComment(store_id, order_id, account_id, comment, image, star, created_date, updated_date) {
   try {
     await Comment.create({
       store_id: store_id,
@@ -65,8 +65,8 @@ async function insertComment(store_id, order_id, account_id, comment, image, sta
       comment: comment,
       image: image,
       star: star,
-      timestamp: timestamp,
-      updated: updated,
+      created_date: created_date,
+      updated_date: updated_date,
     });
     return true;
   } catch (err) {
@@ -75,7 +75,7 @@ async function insertComment(store_id, order_id, account_id, comment, image, sta
   }
 }
 
-async function updateComment(store_id, order_id, account_id, comment, star, updated) {
+async function updateComment(store_id, order_id, account_id, comment, star, updated_date) {
   try {
     await Comment.update(
       {
@@ -84,7 +84,7 @@ async function updateComment(store_id, order_id, account_id, comment, star, upda
         account_id: account_id,
         comment: comment,
         star: star,
-        updated: updated,
+        updated_date: updated_date,
       },
       {
         where: {
@@ -105,7 +105,7 @@ async function getCommentsListFromStore(store_id) {
   try {
     const data = await sequelize.query(
       "SELECT id , order_id, (select name from account a where a.id = c.account_id) 'name' " +
-        ", comment, star, timestamp, updated FROM food_delivery.comment c where c.store_id = '" +
+        ", comment, star, created_date, updated_date FROM food_delivery.comment c where c.store_id = '" +
         store_id +
         "'",
       {

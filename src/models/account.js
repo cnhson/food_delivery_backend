@@ -33,7 +33,7 @@ const Account = sequelize.define(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
-    timestamp: {
+    created_date: {
       type: DataTypes.STRING(25),
     },
   },
@@ -42,7 +42,7 @@ const Account = sequelize.define(
   }
 );
 
-async function insertAccount(id, role_id, name, email, password, timestamp) {
+async function insertAccount(id, role_id, name, email, password, created_date) {
   try {
     await Account.create({
       id: id,
@@ -51,7 +51,7 @@ async function insertAccount(id, role_id, name, email, password, timestamp) {
       email: email,
       password: password,
       del_fag: false,
-      timestamp,
+      created_date,
     });
     return true;
   } catch (err) {

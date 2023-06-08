@@ -23,10 +23,10 @@ module.exports = {
       const description = req.body.description;
       const image = req.body.image;
       const type_id = req.body.type_id;
-      const timestamp = req.body.timestamp;
+      const created_date = req.body.created_date;
       const owner_id = req.body.owner_id;
 
-      const result = await insertStore(id, owner_id, name, address, description, image, type_id, timestamp);
+      const result = await insertStore(id, owner_id, name, address, description, image, type_id, created_date);
 
       if (result) {
         res.status(200).json({ message: "Create store successfully" });
@@ -85,9 +85,9 @@ module.exports = {
       const address = req.body.address;
       const description = req.body.description;
       const type_id = req.body.type_id;
-      const timestamp = req.body.timestamp;
+      const created_date = req.body.created_date;
 
-      const result = await updateStoreById(id, owner_id, name, address, description, type_id, timestamp);
+      const result = await updateStoreById(id, owner_id, name, address, description, type_id, created_date);
 
       if (result) {
         res.status(200).json({ message: "Edit store successfully" });

@@ -48,6 +48,8 @@ module.exports = {
     const type_id = req.body.type_id;
     const image = req.body.image;
     const price = req.body.price;
+    const stock = req.body.stock;
+    const created_date = req.body.created_date;
 
     try {
       // check store id if exists
@@ -56,8 +58,11 @@ module.exports = {
         res.status(402).json({ error: "Store does not exists" });
         return;
       }
+      if (stock == undefined || stock == null || stock == "") {
+        stock = 0;
+      }
 
-      const result = await addProduct(store_id, name, description, type_id, image, price);
+      const result = await addProduct(store_id, name, description, type_id, image, price, stock, created_date);
       if (result) {
         res.status(200).json({ message: "Create new product successfully!" });
       } else {
@@ -78,6 +83,8 @@ module.exports = {
       const type_id = req.body.type_id;
       const image = req.body.image;
       const price = req.body.price;
+      const stock = req.body.stock;
+      const updated_date = req.body.updated_date;
 
       // check if store_id is own this product
       const check = await getProductByIdAndStoreId(id, store_id);
@@ -87,7 +94,7 @@ module.exports = {
       }
 
       // edit product
-      const result = await updateProductById(id, name, description, image, type_id, price);
+      const result = await updateProductById(id, name, description, image, type_id, price, stock, updated_date);
       if (result) {
         res.status(200).json({ message: "Edit product successfully" });
         return;
