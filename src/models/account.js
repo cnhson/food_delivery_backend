@@ -29,7 +29,14 @@ const Account = sequelize.define(
     active_date: {
       type: DataTypes.STRING(25),
     },
-    del_fag: {
+    phone: {
+      type: DataTypes.STRING(15),
+    },
+    momo_check: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    del_flag: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
@@ -50,7 +57,7 @@ async function insertAccount(id, role_id, name, email, password, created_date) {
       name: name,
       email: email,
       password: password,
-      del_fag: false,
+      del_flag: false,
       created_date,
     });
     return true;
@@ -90,8 +97,7 @@ async function getAccountByEmailAndRole(email, role_id) {
 }
 
 async function getAccountById(userId) {
-  return await Account.findAll({
-    attributes: ["id", "email", "name"],
+  return await Account.findOne({
     where: {
       id: {
         [Op.eq]: userId,

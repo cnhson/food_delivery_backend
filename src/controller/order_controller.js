@@ -1,7 +1,7 @@
 const {
   insertOrder,
   getUserOrderWithCommentList,
-  //calculateTotalPerDayWithLimit,
+  calculateTotalPerDayWithLimit,
   updateStatus,
   getTotalOrdersByStatus,
   getRangeOrdersByStatus,

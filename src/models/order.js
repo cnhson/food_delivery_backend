@@ -332,5 +332,5 @@ module.exports = {
   getTotalOrdersByStatus,
   getRangeOrdersByStatus,
   getRangeOrdersByStatusOfUser,
-  //calculateTotalPerDayWithLimit,
+  calculateTotalPerDayWithLimit,
 };
