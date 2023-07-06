@@ -1,5 +1,5 @@
 const { sequelize } = require("../services/common");
-const { DataTypes, Op } = require("sequelize");
+const { DataTypes, Op, QueryTypes } = require("sequelize");
 
 const Account = sequelize.define(
   "account",
@@ -126,4 +126,42 @@ async function getAccountByIdAndRole(userId, role_id) {
   });
 }
 
-module.exports = { Account, insertAccount, getAccountByEmailAndRole, getAccountById, getAccountByIdAndRole };
+async function updateAccountPassword(id, password) {
+  try {
+    await Account.update(
+      {
+        password: password,
+      },
+      {
+        where: {
+          id: id,
+        },
+      }
+    );
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+async function getAccountPasswordById(id) {
+  try {
+    const data = await sequelize.query("Select password from account where id = '" + id + "'", {
+      type: QueryTypes.SELECT,
+    });
+    return data;
+  } catch (err) {
+    return false;
+  }
+}
+
+module.exports = {
+  Account,
+  insertAccount,
+  getAccountByEmailAndRole,
+  getAccountById,
+  getAccountByIdAndRole,
+  updateAccountPassword,
+  getAccountPasswordById,
+};

@@ -1,7 +1,6 @@
 const {
   insertOrder,
   getUserOrderWithCommentList,
-  calculateTotalPerDayWithLimit,
   updateStatus,
   getTotalOrdersByStatus,
   getRangeOrdersByStatus,
@@ -20,11 +19,13 @@ const {
   getTotalPriceByOrderId,
   checkproceedOrderDetail,
   proceedOrderDetail,
+  orderSeenCheckWithStore,
+  getUnseenOrderFromStore,
 } = require("../models/order_detail");
-const crypto = require("crypto");
+//const crypto = require("crypto");
 const { getAccountByIdAndRole } = require("../models/account");
 const { pagination, checkNextAndPreviousPage } = require("../services/common");
-const { getStatusById } = require("../models/status");
+//const { getStatusById } = require("../models/status");
 //const { getProductTypeById } = require("../models/product_type");
 //const { getProductById } = require("../models/menu");
 //const { getStoreById } = require("../models/store");
@@ -129,29 +130,6 @@ module.exports = {
     }
   },
 
-  //Chart
-
-  profitPerDate: async function (req, res) {
-    try {
-      const store_id = req.body.store_id;
-
-      //How many prev days limited by number
-
-      const limit = req.body.limit;
-      const data = await calculateTotalPerDayWithLimit(store_id, limit);
-
-      //Change to array[[created_date,total]]
-      let arraydata = [];
-
-      for (const index in data) {
-        arraydata.push([parseInt(data[index].otimestamp), data[index].total]);
-      }
-      res.status(200).json(arraydata);
-    } catch (err) {
-      res.status(500).send(err);
-    }
-  },
-
   createOrder: async function (req, res) {
     try {
       const order_id = req.body.order_id;
@@ -247,7 +225,7 @@ module.exports = {
     const page = Number(req.query.page);
     const size = Number(req.query.size);
 
-    console.log(store_id, status_id, page, size);
+    //console.log(store_id, status_id, page, size);
 
     try {
       const data = pagination;
@@ -284,7 +262,6 @@ module.exports = {
 
     try {
       const order = await getOrderById(order_id);
-
       const orderdetail = await getOrderDetailById(order_id);
 
       let totalprice = 0;
@@ -310,28 +287,42 @@ module.exports = {
     }
   },
 
-  // Test output random ids
-  test: async function (req, res) {
-    const rid1 = crypto.randomBytes(3).toString("hex");
-    const rid2 = crypto.randomBytes(5).toString("hex");
-    res.status(200).json({ r1: rid1, r2: rid2 });
+  orderSeenStatusSet: async function (req, res) {
+    try {
+      const store_id = req.body.store_id;
+
+      const product_list = req.body.product_list;
+
+      // product_list.forEach((item) => {
+      //   console.log(item, store_id);
+      // });
+
+      const result = product_list.map((item) => {
+        orderSeenCheckWithStore(item.order_id, item.product_id, store_id);
+      });
+
+      await Promise.all(result);
+
+      if (result) {
+        res.status(200).json({ message: "Order seen status updated successfully" });
+      } else res.status(404).json({ error: "Failed" });
+    } catch (err) {
+      res.status(500).send(err);
+    }
   },
 
-  //Table
+  getUnseenStatusOrder: async function (req, res) {
+    try {
+      const store_id = req.body.store_id;
 
-  // profitPerDate: async function (req, res) {
-  //   try {
-  //     const store_id = req.body.store_id;
+      const data = await getUnseenOrderFromStore(store_id);
+      if (data) {
+        res.status(200).json(data);
+      } else res.status(404).json({ error: "Failed" });
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
 
-  //     const page = req.body.page_id;
-  //     const PAGE_SIZE = 5;
-  //     const skip = (page - 1) * PAGE_SIZE;
-
-  //     const records = await calculateTotalPerDayWithLimit(store_id, PAGE_SIZE, skip);
-
-  //     res.status(200).json({ page, records });
-  //   } catch (err) {
-  //     res.status(500).send("WTF calculate");
-  //   }
-  // },
+  test: async function (req, res) {},
 };

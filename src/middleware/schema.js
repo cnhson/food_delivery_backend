@@ -19,11 +19,13 @@ const address = name;
 const description = name;
 
 const role_id = Joi.string().valid("CUS", "SEL").required();
-const owner_id = Joi.string().length(10).required();
+const id = Joi.string().length(10).required();
 const comment_id = Joi.number().min(0).required();
 const store_type = Joi.string().required();
+const year = Joi.string().pattern(new RegExp("^[0-9]{4,4}$")).required();
+const month = Joi.string().pattern(new RegExp("^[0-9]{1,2}$")).required();
 
-const password = Joi.string().pattern(new RegExp("^[a-zA-Z0-9!@#$%^&*()+-/]{8,100}$")).required();
+const password = Joi.string().pattern(new RegExp("^[a-zA-Z0-9!@#$%^&*()+-]{8,100}$")).required();
 const product_id = Joi.number().min(0).required();
 const product_array = Joi.array().min(0).required();
 const account_id = Joi.string().length(10).required();
@@ -57,7 +59,7 @@ const size = Joi.number().valid(20, 50, 100).required();
 ////  Schemas zone //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const schemas = {
   registerAccount: Joi.object().keys({
-    id: owner_id,
+    id: id,
     role_id: role_id,
     name: name,
     email: email,
@@ -70,6 +72,12 @@ const schemas = {
     role_id: role_id,
     email: email,
     password: password,
+  }),
+
+  changePassword: Joi.object().keys({
+    id: id,
+    oldpassword: password,
+    newpassword: password,
   }),
 
   createComment: Joi.object().keys({
@@ -145,9 +153,9 @@ const schemas = {
     created_date: created_date,
   }),
 
-  profitPerDay: Joi.object().keys({
+  profitYear: Joi.object().keys({
     store_id: store_id,
-    limit: Joi.number().required(),
+    year: year,
   }),
 
   changeOrderStatus: Joi.object().keys({
@@ -158,7 +166,7 @@ const schemas = {
 
   createStore: Joi.object().keys({
     id: store_id,
-    owner_id: owner_id,
+    id: id,
     name: name,
     address: address,
     description: description,
@@ -169,7 +177,7 @@ const schemas = {
 
   editStore: Joi.object().keys({
     id: store_id,
-    owner_id: owner_id,
+    id: id,
     name: name,
     address: address,
     description: description,
@@ -177,7 +185,7 @@ const schemas = {
     created_date: created_date,
   }),
   userId: Joi.object().keys({
-    userId: owner_id,
+    userId: id,
   }),
   storeId: Joi.object().keys({
     storeId: store_id,
@@ -201,7 +209,7 @@ const schemas = {
     size: size,
   }),
   getAccountOrders: Joi.object().keys({
-    user_id: owner_id,
+    user_id: id,
     status_id: status_id,
     page: page,
     size: size,

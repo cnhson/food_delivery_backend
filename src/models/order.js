@@ -164,7 +164,7 @@ async function getRangeOrdersByStatus(start, size, store_id, status_id) {
   const data = await sequelize.query(
     "SELECT o.id, (select email from account a where a.id = o.account_id) 'email', created_date, payment_method, product_id, " +
       "(select name from menu m where m.id = product_id) 'product', " +
-      "(select name from status s where s.id = o.status) 'status', progress, proceed, od.quantity " +
+      "(select name from status s where s.id = o.status) 'status', od.quantity,  progress, proceed, is_seen " +
       "FROM food_delivery.order o inner join order_detail od on o.id = od.order_id " +
       "where store_id = '" +
       store_id +
@@ -242,10 +242,6 @@ async function updateStatus(id, status_id) {
       },
       {
         where: {
-          // id: {
-          //   [Op.eq]: id,
-          // },
-
           id: id,
         },
       }
@@ -257,16 +253,35 @@ async function updateStatus(id, status_id) {
   }
 }
 
-async function calculateTotalPerDayWithLimit(store_id, limit) {
+async function calculateProfitWithYear(store_id, year) {
   try {
     const data = await sequelize.query(
-      "SELECT Round(UNIX_TIMESTAMP(FROM_UNIXTIME(ord.created_date/1000, '%Y-%m-%d'))*1000) 'otimestamp'," +
+      "SELECT UNIX_TIMESTAMP(STR_TO_DATE(ord.created_date, '%Y-%m-%dT'))*1000 'otimestamp'," +
         " SUM(price + ship_fee * quantity ) 'total' FROM food_delivery.order ord " +
         "inner join order_detail od on ord.id = od.order_id " +
         "where store_id = '" +
         store_id +
-        "' group by otimestamp order by otimestamp desc limit " +
-        limit,
+        "' and ord.created_date like '" +
+        year +
+        "-%' group by otimestamp order by otimestamp asc",
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+    return data;
+  } catch (err) {
+    console.log(err);
+    return 0;
+  }
+}
+
+async function getTotalProfitAndQuantityByStatus(store_id) {
+  try {
+    const data = await sequelize.query(
+      "Select SUM(od.quantity * od.price)'tamount', count(quantity)'tquantity' ,o.status from food_delivery.order o inner join order_detail od" +
+        " on o.id = od.order_id where store_id = '" +
+        store_id +
+        "' group by status",
       {
         type: QueryTypes.SELECT,
       }
@@ -295,7 +310,7 @@ async function getOrderReceivedStateByOrderId(order_id) {
     return 0;
   }
 }
-// async function calculateTotalPerDayWithLimit(store_id, limit, skip) {
+// async function calculateProfitWithYear(store_id, limit, skip) {
 //   try {
 //     const data = await sequelize.query(
 //       "SELECT FROM_UNIXTIME(ord.created_date/1000, '%Y-%m-%d') 'only_date', SUM(price + ship_fee * quantity ) 'total' FROM food_delivery.order ord " +
@@ -332,5 +347,6 @@ module.exports = {
   getTotalOrdersByStatus,
   getRangeOrdersByStatus,
   getRangeOrdersByStatusOfUser,
-  calculateTotalPerDayWithLimit,
+  getTotalProfitAndQuantityByStatus,
+  calculateProfitWithYear,
 };

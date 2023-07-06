@@ -1,4 +1,10 @@
-const { insertAccount, getAccountByEmailAndRole, getAccountById } = require("../models/account");
+const {
+  insertAccount,
+  getAccountByEmailAndRole,
+  getAccountById,
+  updateAccountPassword,
+  getAccountPasswordById,
+} = require("../models/account");
 const bcrypt = require("bcryptjs");
 const { getUserStore } = require("../models/store");
 
@@ -79,7 +85,7 @@ module.exports = {
           });
         } else {
           const store = await getUserStore(account.id);
-          console.log(store);
+          //console.log(store);
           if (store.length === 0) {
             //owner not yet created store
             sid = 0;
@@ -110,6 +116,59 @@ module.exports = {
       res.status(200).json(data);
     } catch (err) {
       res.status(404).json({ error: err });
+    }
+  },
+
+  changePassword: async function (req, res) {
+    try {
+      const id = req.body.id;
+      const oldpassword = req.body.oldpassword;
+      const newpassword = req.body.newpassword;
+
+      let saved_oldpassword = await getAccountPasswordById(id);
+      //console.log(saved_oldpassword);
+      saved_oldpassword = saved_oldpassword[0].password;
+      bcrypt.compare(oldpassword, saved_oldpassword, async function (err, isMatch) {
+        if (err) {
+          res.status(404).json({ result: "fail", content: "Cannot hash 1" });
+          return;
+        }
+        if (!isMatch) {
+          res.status(404).json({ result: "fail", content: "Your current password is not matching" });
+          return;
+        } else {
+          bcrypt.compare(newpassword, saved_oldpassword, async function (err, isMatch) {
+            if (err) {
+              res.status(404).json({ result: "fail", content: "Cannot hash 2" });
+              return;
+            }
+            if (isMatch) {
+              res.status(404).json({ result: "fail", content: "New password can not be same to old password" });
+              return;
+            } else {
+              bcrypt.genSalt(10, function (err, Salt) {
+                bcrypt.hash(newpassword, Salt, async function (err, hash) {
+                  if (err) {
+                    res.status(404).json({ result: "fail", content: "Cannot hash 3" });
+                    return;
+                  }
+                  let newHashedPassword = hash;
+                  const result = await updateAccountPassword(id, newHashedPassword);
+                  if (result) {
+                    res.status(200).json({ result: "success", content: "Change password successfully!" });
+                    return;
+                  } else {
+                    res.status(404).json({ result: "fail", content: "Change password fail!" });
+                    return;
+                  }
+                });
+              });
+            }
+          });
+        }
+      });
+    } catch (err) {
+      res.status(404).json({ result: "fail", content: "Error" });
     }
   },
 };

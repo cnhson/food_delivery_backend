@@ -45,7 +45,10 @@ const orderDetail = sequelize.define(
     },
     proceed: {
       type: DataTypes.TINYINT(1),
-      allowNull: true,
+      defaultValue: 0,
+    },
+    is_seen: {
+      type: DataTypes.TINYINT(1),
       defaultValue: 0,
     },
   },
@@ -152,6 +155,38 @@ async function proceedOrderDetail(order_id, product_id, store_id) {
   }
 }
 
+async function orderSeenCheckWithStore(order_id, product_id, store_id) {
+  try {
+    await orderDetail.update(
+      { is_seen: 1 },
+      {
+        where: {
+          order_id: order_id,
+          product_id: product_id,
+          store_id: store_id,
+        },
+      }
+    );
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function getUnseenOrderFromStore(store_id) {
+  try {
+    const data = await sequelize.query(
+      "SELECT order_id, product_id FROM food_delivery.order_detail where store_id ='" + store_id + "' and is_seen = 0",
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+    return data;
+  } catch (error) {
+    return error;
+  }
+}
+
 // async function deproceedOrderDetail(order_id, store_id, product_id) {
 //   try {
 //     await orderDetail.update(
@@ -176,6 +211,8 @@ module.exports = {
   checkproceedOrderDetail,
   proceedOrderDetail,
   //deproceedOrderDetail,
+  orderSeenCheckWithStore,
+  getUnseenOrderFromStore,
   getOrderDetailById,
   getTotalPriceByOrderId,
   getProductListWithOrderId,
