@@ -20,27 +20,27 @@ const Status = sequelize.define(
 
 async function insertDefaultStatus() {
   await Status.upsert({
-    id: "NRY",
-    name: "not received yet",
+    id: "PENDING",
+    name: "order is waiting to be comfirmed",
   });
   await Status.upsert({
-    id: "RCD",
-    name: "received",
+    id: "CONFIRMED",
+    name: "order is confirmed",
   });
   await Status.upsert({
-    id: "SHP",
-    name: "shipping",
+    id: "SHIPPING",
+    name: "order is being shipped",
   });
   await Status.upsert({
-    id: "SUC",
-    name: "success",
+    id: "SUCCESS",
+    name: "order is shipped successfully",
   });
   await Status.upsert({
-    id: "FAL",
-    name: "failed",
+    id: "FAILED",
+    name: "order is failed",
   });
 }
-
+// store -> product -> shipper -> customer
 async function getStatusById(status_id) {
   return await Status.findAll({
     attributes: ["name"],

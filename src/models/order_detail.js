@@ -77,16 +77,9 @@ async function insertOrderDetail(order_id, product_id, quantity, store_id, price
 
 async function getProductListWithOrderId(order_id, store_id) {
   try {
-    const data = await sequelize.query(
-      "select product_id,(select name from menu m where od.product_id = m.id) 'name' from order_detail od where order_id = '" +
-        order_id +
-        "' and store_id = '" +
-        store_id +
-        "'",
-      {
-        type: QueryTypes.SELECT,
-      }
-    );
+    const data = await sequelize.query("select product_id,(select name from menu m where od.product_id = m.id) 'name' from order_detail od where order_id = '" + order_id + "' and store_id = '" + store_id + "'", {
+      type: QueryTypes.SELECT,
+    });
     return data;
   } catch (error) {
     console.log(error);
@@ -95,42 +88,23 @@ async function getProductListWithOrderId(order_id, store_id) {
 }
 
 async function getOrderDetailById(order_id) {
-  return await sequelize.query(
-    "select product_id, " +
-      "(select name from menu m where od.product_id = m.id) 'product_name', store_id, " +
-      "(select name from store s where od.store_id = s.id) 'store_name', quantity, price from order_detail od where od.order_id = '" +
-      order_id +
-      "'",
-    {
-      type: QueryTypes.SELECT,
-    }
-  );
+  return await sequelize.query("select product_id, " + "(select name from menu m where od.product_id = m.id) 'product_name', store_id, " + "(select name from store s where od.store_id = s.id) 'store_name', quantity, price from order_detail od where od.order_id = '" + order_id + "'", {
+    type: QueryTypes.SELECT,
+  });
 }
 
 async function getTotalPriceByOrderId(order_id) {
-  const data = await sequelize.query(
-    "select SUM(quantity * price) as 'total' from order_detail where order_id = '" + order_id + "'",
-    {
-      type: QueryTypes.SELECT,
-    }
-  );
+  const data = await sequelize.query("select SUM(quantity * price) as 'total' from order_detail where order_id = '" + order_id + "'", {
+    type: QueryTypes.SELECT,
+  });
   if (data) return data[0].total;
 }
 
 async function checkproceedOrderDetail(order_id, product_id, store_id) {
   try {
-    const data = await sequelize.query(
-      "select proceed from food_delivery.order_detail where order_id = '" +
-        order_id +
-        "' and product_id = '" +
-        product_id +
-        "' and store_id ='" +
-        store_id +
-        "'",
-      {
-        type: QueryTypes.SELECT,
-      }
-    );
+    const data = await sequelize.query("select proceed from food_delivery.order_detail where order_id = '" + order_id + "' and product_id = '" + product_id + "' and store_id ='" + store_id + "'", {
+      type: QueryTypes.SELECT,
+    });
     return data[0].proceed;
   } catch (error) {
     return error;
@@ -175,12 +149,9 @@ async function orderSeenCheckWithStore(order_id, product_id, store_id) {
 
 async function getUnseenOrderFromStore(store_id) {
   try {
-    const data = await sequelize.query(
-      "SELECT order_id, product_id FROM food_delivery.order_detail where store_id ='" + store_id + "' and is_seen = 0",
-      {
-        type: QueryTypes.SELECT,
-      }
-    );
+    const data = await sequelize.query("SELECT order_id, product_id FROM food_delivery.order_detail where store_id ='" + store_id + "' and is_seen = 0", {
+      type: QueryTypes.SELECT,
+    });
     return data;
   } catch (error) {
     return error;

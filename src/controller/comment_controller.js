@@ -16,7 +16,7 @@ module.exports = {
       if (check === null || check === undefined) {
         res.status(200).json({ message: "Please order first!!" });
         return;
-      } else if (check[0].status != "SUC") {
+      } else if (check[0].status != "SUCCESS") {
         res.status(200).json({ message: "You haven't received the order yet!!" });
         return;
       } else {

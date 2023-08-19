@@ -13,5 +13,6 @@ router.post("/totalprofit", store.getTotalProfit);
 router.route("/create/").post(middleware(schemas.createStore, PROPERTY_TYPE.body), store.createStore);
 router.route("/edit/").post(middleware(schemas.editStore, PROPERTY_TYPE.body), store.editStore);
 router.route("/get-all-type").get(store.getAllType);
+router.post("/get-best-sold-products", store.getMostSoldProducts);
 
 module.exports = router;

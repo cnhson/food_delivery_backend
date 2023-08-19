@@ -1,27 +1,5 @@
-const {
-  insertOrder,
-  getUserOrderWithCommentList,
-  updateStatus,
-  getTotalOrdersByStatus,
-  getRangeOrdersByStatus,
-  getOrderByAccount,
-  getOrderById,
-  getTotalOrdersByStatusOfUser,
-  getOrderProgress,
-  getOrderProductCount,
-  increaseOrderProgress,
-  getRangeOrdersByStatusOfUser,
-  getOrderReceivedStateByOrderId,
-} = require("../models/order");
-const {
-  insertOrderDetail,
-  getOrderDetailById,
-  getTotalPriceByOrderId,
-  checkproceedOrderDetail,
-  proceedOrderDetail,
-  orderSeenCheckWithStore,
-  getUnseenOrderFromStore,
-} = require("../models/order_detail");
+const { insertOrder, getUserOrderWithCommentList, updateStatus, getTotalOrdersByStatus, getRangeOrdersByStatus, getOrderByAccount, getOrderById, getTotalOrdersByStatusOfUser, getOrderProgress, getOrderProductCount, increaseOrderProgress, getRangeOrdersByStatusOfUser, getOrderReceivedStateByOrderId } = require("../models/order");
+const { insertOrderDetail, getOrderDetailById, getTotalPriceByOrderId, checkproceedOrderDetail, proceedOrderDetail, orderSeenCheckWithStore, getUnseenOrderFromStore } = require("../models/order_detail");
 //const crypto = require("crypto");
 const { getAccountByIdAndRole } = require("../models/account");
 const { pagination, checkNextAndPreviousPage } = require("../services/common");
@@ -41,7 +19,7 @@ module.exports = {
     }
   },
 
-  OrderComment: async function (req, res) {
+  orderComment: async function (req, res) {
     try {
       const account_id = req.body.account_id;
       const order_id = req.body.order_id;
@@ -70,7 +48,7 @@ module.exports = {
         // check if this order is accepted or not
         if (checkCus.length > 0) {
           const status = checkCus[0].status;
-          if (status !== "NRY") {
+          if (status !== "PENDING") {
             res.status(500).json({
               error: "This order cannot be canceled because the store owner has already accepted it",
             });
@@ -117,12 +95,12 @@ module.exports = {
 
       //check order's current total accepted (progress) with condition amount (productcount)
       if (progress == 0) {
-        await updateStatus(order_id, "NRY");
+        await updateStatus(order_id, "PENDING");
       } else {
         if (progress == productcount) {
-          await updateStatus(order_id, "SHP");
+          await updateStatus(order_id, "SHIPPING");
         } else {
-          await updateStatus(order_id, "RCD");
+          await updateStatus(order_id, "CONFIRMED");
         }
       }
     } catch (err) {
@@ -150,15 +128,7 @@ module.exports = {
       }
 
       // insert order into db
-      const order = await insertOrder(
-        order_id,
-        account_id,
-        address,
-        ship_fee,
-        payment_method,
-        product_count,
-        created_date
-      );
+      const order = await insertOrder(order_id, account_id, address, ship_fee, payment_method, product_count, created_date);
       if (!order) {
         res.status(500).json({ error: "Create order failed!" });
         return;

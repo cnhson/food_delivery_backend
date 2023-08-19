@@ -68,18 +68,7 @@ const Menu = sequelize.define(
   }
 );
 
-async function addProduct(
-  store_id,
-  name,
-  description,
-  type_id,
-  image,
-  price,
-  stock,
-  created_date,
-  stock,
-  created_date
-) {
+async function addProduct(store_id, name, description, type_id, image, price, stock, created_date, stock, created_date) {
   try {
     await Menu.create({
       store_id: store_id,
@@ -281,6 +270,23 @@ async function getProductDetail(id) {
   }
 }
 
+async function getBestSoldProductsFromStore(store_id) {
+  try {
+    const data = await sequelize.query(
+      "select product_id, Sum(quantity) 'sum', (select name from menu m where od.product_id = m.id) 'product_name' " +
+        "from order_detail od where store_id='" +
+        store_id +
+        "' group by product_id limit 3",
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+    return data;
+  } catch (error) {
+    return error;
+  }
+}
+
 module.exports = {
   Menu,
   getRandomProductInStore,
@@ -293,4 +299,5 @@ module.exports = {
   updateProductById,
   getProductByIdAndStoreId,
   getMostOrderedProductsDesc,
+  getBestSoldProductsFromStore,
 };

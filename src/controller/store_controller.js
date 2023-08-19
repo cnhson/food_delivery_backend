@@ -1,7 +1,7 @@
 const { insertStore, getStoreById, getUserStore, updateStoreById, getAll } = require("../models/store");
 const { getCommentsListFromStore } = require("../models/comment");
 const { getProductListWithOrderId } = require("../models/order_detail");
-const { getProductsByStore } = require("../models/menu");
+const { getProductsByStore, getBestSoldProductsFromStore } = require("../models/menu");
 const { getAllType } = require("../models/store_type");
 const { calculateProfitWithYear, getTotalProfitAndQuantityByStatus } = require("../models/order");
 
@@ -207,6 +207,19 @@ module.exports = {
           }
         }
       }
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  },
+
+  getMostSoldProducts: async function (req, res) {
+    try {
+      const store_id = req.body.store_id;
+
+      const data = await getBestSoldProductsFromStore(store_id);
+      if (data) {
+        res.status(200).json(data);
+      } else res.status(404).json({ error: "Failed" });
     } catch (err) {
       res.status(500).send(err);
     }

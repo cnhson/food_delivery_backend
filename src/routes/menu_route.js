@@ -15,16 +15,10 @@ router.route("/new-product/").post(middleware(schemas.createProduct, PROPERTY_TY
 router.route("/edit-product/").post(middleware(schemas.editProduct, PROPERTY_TYPE.body), menu.editProduct);
 
 // product type
-router
-  .route("/new-product-type/")
-  .post(middleware(schemas.createProductType, PROPERTY_TYPE.body), menu.createProductType);
+router.route("/new-product-type/").post(middleware(schemas.createProductType, PROPERTY_TYPE.body), menu.createProductType);
 
 router.route("/get-product-type/:type_id").get(middleware(schemas.type_id, PROPERTY_TYPE.params), menu.getProductType);
-router
-  .route("/edit-product-type/")
-  .post(middleware(schemas.editProductType, PROPERTY_TYPE.body), menu.updateProductType);
-router
-  .route("/get-all-product-type/:storeId")
-  .get(middleware(schemas.storeId, PROPERTY_TYPE.params), menu.getAllProductType);
+router.route("/edit-product-type/").post(middleware(schemas.editProductType, PROPERTY_TYPE.body), menu.updateProductType);
+router.route("/get-all-product-type/:storeId").get(middleware(schemas.storeId, PROPERTY_TYPE.params), menu.getAllProductType);
 
 module.exports = router;

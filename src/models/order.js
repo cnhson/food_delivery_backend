@@ -65,7 +65,7 @@ async function insertOrder(order_id, account_id, address, ship_fee, payment_meth
       ship_fee: ship_fee,
       payment_method: payment_method,
       product_count: product_count,
-      status: "NRY",
+      status: "PENDING",
       created_date: created_date,
       progress: 0,
     });
@@ -278,8 +278,8 @@ async function calculateProfitWithYear(store_id, year) {
 async function getTotalProfitAndQuantityByStatus(store_id) {
   try {
     const data = await sequelize.query(
-      "Select SUM(od.quantity * od.price)'tamount', count(quantity)'tquantity' ,o.status from food_delivery.order o inner join order_detail od" +
-        " on o.id = od.order_id where store_id = '" +
+      "Select SUM(od.quantity * od.price)'tamount', count(quantity)'tquantity' ,o.status, (select color from food_delivery.status st where st.id = o.status) 'color'" +
+        "from food_delivery.order o inner join order_detail od on o.id = od.order_id where store_id = '" +
         store_id +
         "' group by status",
       {
